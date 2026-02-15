@@ -5,8 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import {ConfigModule} from '@nestjs/config';
 import { ConfigService } from '@nestjs/config';
 import { AuthModule } from '../auth/auth.module';
-import { Terminal } from 'src/apps/web_terminal/entity/WT.entity';
-
+import { Terminal } from 'src/apps/web_terminal/entity/wt.entity';
 
 
 

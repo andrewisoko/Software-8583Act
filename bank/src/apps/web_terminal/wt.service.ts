@@ -1,13 +1,16 @@
 import { Injectable } from "@nestjs/common"
 import { JwtService } from "@nestjs/jwt"
-import { Terminal } from "./entity/WT.entity";
-
+import { Terminal } from "./entity/wt.entity";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Role } from "./entity/wt.entity";
 
 
 
 Injectable()
 export class WebTerminal{
     constructor(
+        @InjectRepository(Terminal) private readonly TerminalRepository: Repository<Terminal>,
         private readonly jwtService:JwtService,
     ){}
 
@@ -34,19 +37,24 @@ export class WebTerminal{
 
     }
 
-    CreateWT(id:Terminal){
+    async CreateWT(){
 
             const serialNumber = this.generateSerialNum();
             const signature = this.generateSignature();
 
         const certTerminal = {
-            id: id,
             serialNumber:Number(serialNumber),
             signature: signature,
-            issuer: 'Tututorial Bank',
-            subject: 'Merchant Tutorial'
+            issuer:'Tututorial Bank',
+            subject:'Merchant Tutorial',
+            role: Role.TERMINAL
         };
-        return this.jwtService.sign(certTerminal);
+        const terminal_token = this.jwtService.sign(certTerminal);
+
+        await this.TerminalRepository.create(certTerminal)
+        await this.TerminalRepository.save(certTerminal)
+
+        return {terminal_token:terminal_token}
 
     }
 

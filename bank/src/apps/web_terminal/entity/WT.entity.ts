@@ -1,7 +1,10 @@
 import { PrimaryGeneratedColumn,Column } from "typeorm/browser";
 import { Entity } from "typeorm/browser";
 
-
+export enum Role {
+    CUSTOMER = "customer",
+    TERMINAL = "terminal"
+}
 
 Entity("terminals")
 export class Terminal{
@@ -20,5 +23,12 @@ export class Terminal{
 
     @Column()
     subject:string;
+
+    @Column({
+        type:"enum",
+        enum:Role,
+        default:Role.CUSTOMER
+    })
+    role:Role
 
 }
