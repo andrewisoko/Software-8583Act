@@ -15,14 +15,14 @@ import { Terminal } from 'src/apps/web_terminal/entity/wt.entity';
     ConfigModule.forRoot({
 
       isGlobal:true,
-      envFilePath:__dirname + '/../../.env'
+      envFilePath:__dirname + '/../../../.env'
     }
   ),
   TypeOrmModule.forRootAsync({
     imports:[ConfigModule,AuthModule],
     inject:[ConfigService],
     useFactory:(configService:ConfigService) => {
-      console.log(configService.get<string>('DB_USER'))
+      // console.log(configService.get<string>('DB_USER'))
       return{
         type: 'postgres',
         host: configService.get<string>('DB_'),

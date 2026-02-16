@@ -1,5 +1,4 @@
-import { PrimaryGeneratedColumn,Column } from "typeorm/browser";
-import { Entity } from "typeorm/browser";
+import { PrimaryGeneratedColumn,Column,Entity } from "typeorm";
 
 export enum Role {
     CUSTOMER = "customer",
