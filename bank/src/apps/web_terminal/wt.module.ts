@@ -1,15 +1,17 @@
-import { JwtModule } from "@nestjs/jwt";
+import { JwtModule, JwtService } from "@nestjs/jwt";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { PassportModule } from "@nestjs/passport";
 import { Module } from "@nestjs/common";
-import { AuthController } from "./auth.controller";
-import { AuthService } from "./auth.service";
-import { JwtStrategy } from "./jwt.strategy";
+import { WebTerminalController } from "./wt.controller";
+import { WebTerminal } from "./wt.service";
+import { Terminal } from "./entity/wt.entity";
+import { TypeOrmModule } from "@nestjs/typeorm";
 
 /* initial auth approach will be a simple jwt authorisation. The app initially verifies if web POS terminal contains the token.*/
 
 @Module({
     imports:[
+        TypeOrmModule.forFeature([Terminal]),
         PassportModule,
         JwtModule.registerAsync({
             imports:[ConfigModule],
@@ -17,13 +19,13 @@ import { JwtStrategy } from "./jwt.strategy";
             useFactory:(configService:ConfigService) => {
                 return{
                     global: true,
-                    secret: configService.get<string>("JWT_KEY")
+                    secret: configService.get<string>("JWT_KEY"),
                 }
             },
         })
     ], 
-    controllers:[AuthController],
-    providers:[AuthService,JwtStrategy]
+    controllers:[WebTerminalController],
+    providers:[WebTerminal]
 })
 
-export class AuthModule {}
+export class WTModule {}

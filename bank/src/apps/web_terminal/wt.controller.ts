@@ -6,8 +6,8 @@ import { RolesGuard } from "src/api_gateway/auth/roles/roles.guard";
 import { WebTerminal } from "./wt.service";
 
 
-@Controller('auth')
-export class AuthController{
+@Controller('terminal')
+export class WebTerminalController{
 
     constructor(private readonly webTerminal:WebTerminal){}
 

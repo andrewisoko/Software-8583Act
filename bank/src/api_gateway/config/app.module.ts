@@ -6,6 +6,8 @@ import {ConfigModule} from '@nestjs/config';
 import { ConfigService } from '@nestjs/config';
 import { AuthModule } from '../auth/auth.module';
 import { Terminal } from 'src/apps/web_terminal/entity/wt.entity';
+import { WTModule } from 'src/apps/web_terminal/wt.module';
+
 
 
 
@@ -19,7 +21,10 @@ import { Terminal } from 'src/apps/web_terminal/entity/wt.entity';
     }
   ),
   TypeOrmModule.forRootAsync({
-    imports:[ConfigModule,AuthModule],
+    imports:[ConfigModule,
+      AuthModule,
+      WTModule
+    ],
     inject:[ConfigService],
     useFactory:(configService:ConfigService) => {
       // console.log(configService.get<string>('DB_USER'))
