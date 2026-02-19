@@ -15,27 +15,31 @@ export class WebTerminal{
     ){}
 
     generateSerialNum(){
-        const randomNum = Math.floor(Math.random() * 100000000);
-        return randomNum.toString().padStart(13,'0')
+        let randomNum = BigInt(Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)) + 1000000000000000n  /* using Big int since interger chosen overpass js number's precision limit. */
+        return randomNum.toString()
     }
 
     generateSignature(){
-
         /* cheap imitation of sha256WithRSAEncryption algorithm output*/
 
-        const randomNum = Math.floor(Math.random() * 100000000);
-        const randomNumtoNine = Math.floor(Math.random() * 9);
+        let randomNum = BigInt(Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)) + 100000000000000000000n  
+        let objContainer =  randomNum.toString().split("");
 
-        const  ThreeSeq = randomNum.toString().padStart(3,'0')
-        const  SixSeq = randomNum.toString().padStart(6,'0')
-        const  twoSeq = randomNum.toString().padStart(2,'0')
+        const objWithDots = () => { 
+        for(let items of objContainer){
+            objContainer[1] = objContainer[3] = objContainer[7] = objContainer[14] = objContainer[16] = objContainer[18] = ".";
+            
+            return objContainer.join('')
+        }
+        }
+        console.log(objContainer)
+        return objWithDots()
 
-        return `${randomNumtoNine}.${randomNumtoNine}.${ThreeSeq}.${SixSeq}.${randomNumtoNine}.${randomNumtoNine}.${twoSeq}`
     }
 
-    generateId(){
 
-    }
+        
+
 
     async CreateWT(){
 
