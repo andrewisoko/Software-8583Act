@@ -5,8 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import {ConfigModule} from '@nestjs/config';
 import { ConfigService } from '@nestjs/config';
 import { AuthModule } from '../../services/auth/auth.module';
-import { Terminal } from 'src/services/merchant.service.ts/entity/wt.entity';
-import { WTModule } from 'src/services/merchant.service.ts/wt.module';
+import { Terminal } from 'src/services/web_terminal/entity/wt.entity';
+import { WTModule } from 'src/services/web_terminal/wt.module';
+import { TransactionModule } from 'src/services/orchestrator/transaction.module';
 
 
 
@@ -21,7 +22,9 @@ import { WTModule } from 'src/services/merchant.service.ts/wt.module';
     }
   ),
   TypeOrmModule.forRootAsync({
-    imports:[ConfigModule,
+    imports:[
+      ConfigModule,
+      TransactionModule,
       AuthModule,
       WTModule
     ],

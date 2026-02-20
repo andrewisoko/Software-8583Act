@@ -17,7 +17,7 @@ import { Controller, Get, Redirect } from '@nestjs/common';
 @Controller()
 export class AppController {
   @Get() // this is "/"
-  @Redirect('http://localhost:3002/api.gateway/transaction/', 302)
+  @Redirect('http://localhost:3002/api.gateway/transaction/orchestra/', 302)
   redirectToTerminalValidation() {
   }
 }

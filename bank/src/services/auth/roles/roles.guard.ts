@@ -1,6 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException,Logger } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Role } from 'src/services/merchant.service.ts/entity/wt.entity';
+import { Role } from 'src/services/web_terminal/entity/wt.entity';
 
 @Injectable()
 export class RolesGuard implements CanActivate{
