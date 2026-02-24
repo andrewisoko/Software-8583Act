@@ -45,7 +45,7 @@ export class Transaction {
     @Column({nullable:true})
     panToken:string;
     
-    @Column()
+    @Column('varchar', {length: 25})
     merchant:string;
 
     @ManyToOne(()=>Account,account =>account.id)

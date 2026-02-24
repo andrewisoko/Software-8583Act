@@ -30,7 +30,7 @@ export class Party {
             this.id = `PARTY_${random}`;
         }
 
-    @Column()
+    @Column('varchar', { length: 20 })
     fullName:string
 
     @Column()

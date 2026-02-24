@@ -12,7 +12,7 @@ export class Account{
             const random = Math.floor(1000 + Math.random() * 9000); 
             this.id = `ACC_${random}`;
         }
-        
+
      @Column({ unique: true })
         accountNumber: string;
 
@@ -25,7 +25,7 @@ export class Account{
     @Column({ type: 'decimal', precision: 15, scale: 2, default: 0 })
         hold: number;               
 
-    @Column({ length: 3, default: 'USD' })
+    @Column({ length: 3, default: 'GBP' })
         currency: string;
 
     @Column({ default: 'ACTIVE' })
