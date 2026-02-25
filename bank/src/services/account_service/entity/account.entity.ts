@@ -1,17 +1,11 @@
-import { Entity, PrimaryColumn,BeforeInsert,Column,CreateDateColumn,UpdateDateColumn } from "typeorm";
+import { Entity,PrimaryGeneratedColumn,Column,CreateDateColumn,UpdateDateColumn } from "typeorm";
 
 
 @Entity("Account")
 export class Account{
 
-    @PrimaryColumn('varchar', { length: 20 })
+    @PrimaryGeneratedColumn('uuid')
      id: string;
-
-    @BeforeInsert()
-        setId() {
-            const random = Math.floor(1000 + Math.random() * 9000); 
-            this.id = `ACC_${random}`;
-        }
 
      @Column({ unique: true })
         accountNumber: string;

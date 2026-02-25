@@ -16,7 +16,7 @@ export class WebTerminal{
 
     generateSerialNum(){
         const randomNum = Math.floor(Math.floor(Math.random() * 999999 + 10000000))
-        return randomNum.toString()  
+        return randomNum
       }
 
     generateSignature(){
@@ -37,8 +37,6 @@ export class WebTerminal{
 
 
         
-
-
     async CreateWT(){
 
         const serialNumber = this.generateSerialNum();

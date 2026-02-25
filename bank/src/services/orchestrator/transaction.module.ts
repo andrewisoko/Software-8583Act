@@ -5,6 +5,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { Transaction } from "./entity/transaction.entity";
 import { HttpModule } from '@nestjs/axios';
 import { TokenisationController } from "../tokenisation_service/tokenisation.controller";
+import { TransactionService } from "./transaction.service";
 
 
 
@@ -14,7 +15,7 @@ import { TokenisationController } from "../tokenisation_service/tokenisation.con
         TypeOrmModule.forFeature([Transaction])
     ],
     controllers:[TransactionController,TokenisationController],
-    providers:[TokenisationService],
+    providers:[TokenisationService,TransactionService],
 })
 
 export class TransactionModule{}

@@ -1,6 +1,6 @@
 import { Terminal } from "src/services/web_terminal/entity/wt.entity";
 import { Party } from "src/services/party_service/entity/party.entity";
-import { Entity,PrimaryColumn,Column, ManyToOne,BeforeInsert,CreateDateColumn } from "typeorm";
+import { Entity,PrimaryColumn,Column, ManyToOne,CreateDateColumn } from "typeorm";
 import { Account } from "src/services/account_service/entity/account.entity";
 
 export enum TRANSACTION_STATUS {
@@ -9,19 +9,19 @@ export enum TRANSACTION_STATUS {
     FAILED = "failed",
     REFUNDED = "refunded"
 }
+
 @Entity("Transaction")
 export class Transaction {
 
-       @PrimaryColumn('varchar', { length: 20 })
-         id: string;
-    
-        @BeforeInsert()
-        setId() {
-            const random = Math.floor(1000 + Math.random() * 9000); 
-            this.id = `TRN_${random}`;
-        }
 
-    @Column()
+    @PrimaryColumn({
+        type: 'varchar',
+        unique: true,
+        default: () => `'TRN_' || nextval('transaction_sequence')`
+        })
+        id: string;
+
+    @Column('varchar', { length:3, default:"GBP" })
     currency:string;
 
     @Column({
@@ -39,13 +39,13 @@ export class Transaction {
     })
     status: TRANSACTION_STATUS;
 
-    @CreateDateColumn({name:'timestamp'})
+    @CreateDateColumn({ name:'timestamp' })
     timestamp:Date
     
     @Column({nullable:true})
     panToken:string;
     
-    @Column('varchar', {length: 25})
+    @Column('varchar', {length: 25 ,default:"Merchant Tutorial"})
     merchant:string;
 
     @ManyToOne(()=>Account,account =>account.id)

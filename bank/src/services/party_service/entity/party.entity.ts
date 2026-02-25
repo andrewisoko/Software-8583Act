@@ -1,4 +1,4 @@
-import { Entity,PrimaryColumn,Column,BeforeInsert } from "typeorm";
+import { Entity,PrimaryColumn,Column,BeforeInsert, PrimaryGeneratedColumn } from "typeorm";
 
 
 export enum TIERS {
@@ -21,30 +21,24 @@ export enum STATUS{
 @Entity("Party")
 export class Party {
 
-     @PrimaryColumn('varchar', { length: 20 })
-         id: string;
-    
-    @BeforeInsert()
-        setId() {
-            const random = Math.floor(1000 + Math.random() * 9000); 
-            this.id = `PARTY_${random}`;
-        }
+    @PrimaryGeneratedColumn('uuid')
+    id:string;
 
-    @Column('varchar', { length: 20 })
-    fullName:string
+    @Column('varchar', { length: 20, default: 'Johnson Handsome' })
+    fullName:string;
 
-    @Column()
-    address:string
+    @Column('varchar', { length: 90, default: '10 London Street CH15 8XF UNITED KINGDOM' })
+    address:string /* not best approach to store addresss but efficient enough for the tutorial */
 
-    @Column()
-    contactDetails:number
+    @Column({ type: 'numeric', precision: 10, scale: 0, default:"0123456789"})
+    contactDetails: number;
 
     @Column({
         type:"enum",
         enum:TIERS,
         default:TIERS.TIER_2
     })
-    kyc:TIERS
+    kyc:TIERS;
 
     @Column({
         type:"enum",
@@ -52,7 +46,7 @@ export class Party {
         default:STATUS.ACTIVE
          }
     )
-    status:STATUS
+    status:STATUS;
 
 }
 

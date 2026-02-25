@@ -1,4 +1,4 @@
-import { PrimaryGeneratedColumn,Column,Entity } from "typeorm";
+import { PrimaryGeneratedColumn,Column,Entity,CreateDateColumn } from "typeorm";
 
 export enum Role {
     CUSTOMER = "customer",
@@ -8,19 +8,19 @@ export enum Role {
 @Entity("Terminal")
 export class Terminal{
 
-    @PrimaryGeneratedColumn()
-    id:number;
+   @PrimaryGeneratedColumn('uuid')
+        id: string;
 
-    @Column()
+    @Column({ type:'numeric', precision:8 ,scale:0 })
     serialNumber:number;
 
-    @Column()
+    @Column( 'varchar', { length:21, default:"1.2.840.113549.1.1.11"} )
     signature:string;
 
-    @Column()
+    @Column( 'varchar', { length:20, default:"Tutorial Bank"} )
     issuer:string;
 
-    @Column()
+    @Column('varchar', { length:20, default:"Merchant Tutorial"} )
     subject:string;
 
     @Column({
@@ -30,7 +30,7 @@ export class Terminal{
     })
     role:Role
 
-    @Column()
+ @CreateDateColumn({name:'timestamp'})
     timestamp:Date
 
 }

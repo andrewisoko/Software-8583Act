@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { AppController } from '../../api_gateway/config/app.controller';
-import { AppService } from '../../api_gateway/config/app.service';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {ConfigModule} from '@nestjs/config';
 import { ConfigService } from '@nestjs/config';
-import { AuthModule } from '../auth/auth.module';
+import { AuthModule } from '../../services/auth/auth.module';
 import { Terminal } from 'src/services/web_terminal/entity/wt.entity';
 import { WTModule } from 'src/services/web_terminal/wt.module';
 import { TransactionModule } from 'src/services/orchestrator/transaction.module';
