@@ -41,9 +41,12 @@ export class Transaction {
 
     @CreateDateColumn({ name:'timestamp' })
     timestamp:Date
+
+    @Column( "varchar", { length:5, default:"12/26" })
+    expiry:string;
     
     @Column({nullable:true})
-    panToken:string;
+    panEncrypt:string;
     
     @Column('varchar', {length: 25 ,default:"Merchant Tutorial"})
     merchant:string;
@@ -52,9 +55,9 @@ export class Transaction {
     account:Account; 
 
     @ManyToOne(()=>Party,party =>party.fullName)
-    customer:Party[]
+    customer:Party;
 
     @ManyToOne(()=>Terminal,terminal =>terminal.signature)
-    terminal:Terminal[]
+    terminal:Terminal;
 }
 

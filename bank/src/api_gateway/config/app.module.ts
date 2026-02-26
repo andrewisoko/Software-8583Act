@@ -13,6 +13,7 @@ import { Transaction } from 'src/services/orchestrator/entity/transaction.entity
 import { RuleEngineModule } from 'src/services/rule_engine_service/rule.engine.module';
 import { AccountModule } from 'src/services/account_service/account.module';
 import { Account } from 'src/services/account_service/entity/account.entity';
+import { TokenisationModule } from 'src/services/tokenisation_service/tokenisation.module';
 
 
 
@@ -29,6 +30,7 @@ import { Account } from 'src/services/account_service/entity/account.entity';
       ConfigModule,
       TransactionModule,
       RuleEngineModule,
+      TokenisationModule,
       AuthModule,
       AccountModule,
       WTModule
