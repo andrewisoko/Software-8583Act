@@ -8,6 +8,7 @@ import { RuleEngineService } from "./rule.engine.service";
 
 
 
+
 @Controller('rule-engine')
 export class RuleEngineController{
 
@@ -18,22 +19,25 @@ export class RuleEngineController{
     @Roles(Role.TERMINAL)
     @Post('checks')
     async ruleEngineChecks(
-        @Request() req,
-       
+        ruleEngineDto:{
+        token:string,
+        amount:number;
+        currency: string;
+        merchant: string;
+        accountStatus:string;
+        customerID: string;
+        }
     ){
-     const {
-        panToken,
-        amount,
-        currency,
-        merchant
-    } = req.customer
+   
 
     return await this.ruleEngineService.
     enginechecks({
-        token:panToken,
-        amount:amount,
-        currency:currency,
-        merchant:merchant
+        token:ruleEngineDto.token,
+        amount:ruleEngineDto.amount,
+        currency:ruleEngineDto.currency,
+        merchant:ruleEngineDto.merchant,
+        accountStatus:ruleEngineDto.accountStatus,
+        customerID:ruleEngineDto.customerID
     })   
 } 
 }

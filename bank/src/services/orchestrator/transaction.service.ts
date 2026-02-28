@@ -11,11 +11,7 @@ import { HttpService } from "@nestjs/axios";
 
 export interface dataPayload {
     token: string;
-    amount:number;
-    currency: string;
-    merchant: string;
     accountStatus:string;
-    timestamp?: Date;
     customerID: string;
     // location?
 
@@ -23,14 +19,18 @@ export interface dataPayload {
 
 export interface fullRequestData {
     pan:string,
-    expiry:string,
     amount:number,
     currency:string,
+    expiry:string,
     merchant:string,
     timestamp:Date,
     customer:string,
     account:string, 
     terminal:string,
+    token?: dataPayload
+    accountStatus?:dataPayload
+    customerID?: dataPayload
+    // location?
 }
 
 @Injectable()
@@ -95,17 +95,8 @@ export class TransactionService{
         return `transaction created`
     }
 
-    async orchestrate({ /* transaction service via httpService orchrstrates its operations */
-        pan,
-        expiry,
-        amount,
-        currency,
-        merchant,
-        timestamp,
-        customer,
-        account,
-        terminal,
-    }:fullRequestData
+    async orchestrate( /* transaction service via httpService orchrstrates its operations */
+    fullRequestData:fullRequestData
     ){
 
         try {
@@ -113,22 +104,24 @@ export class TransactionService{
             /* data from gateway-api to transaction service first hop */
     
             await this.createTransaction({
-                pan,
-                expiry,
-                amount,
-                currency,
-                merchant,
-                timestamp,
-                customer,
-                account,
-                terminal,
+                pan:fullRequestData.pan,
+                expiry:fullRequestData.expiry,
+                amount:fullRequestData.amount,
+                currency:fullRequestData.currency,
+                merchant:fullRequestData.merchant,
+                timestamp:fullRequestData.timestamp,
+                customer:fullRequestData.customer,
+                account:fullRequestData.account,
+                terminal:fullRequestData.terminal,
             })
 
-            const panEncrypt = await this.transactionRepository.findOne({where:{panEncrypt:pan}})
+            const panEncrypt = await this.transactionRepository.findOne({ where:{ panEncrypt:fullRequestData.pan } })
             if(! panEncrypt ) throw new NotFoundException("pan not found");
 
-            const CustomerID = await this.partyRepository.findOne({where:{ id:customerID }});
+            const CustomerID = await this.partyRepository.findOne({ where:{ id: fullRequestData.customerID } });
             if (! CustomerID ) throw new NotFoundException("customerID not found");
+
+            const accountStatus = await this.accountRepository.findOne({ where:{ status:fullRequestData.accountStatus }})
             let panToken;
 
             /* transansaction service calls merchant service (Auth) */
@@ -153,11 +146,11 @@ export class TransactionService{
                     'http://localhost:3002/api.gateway/rule-engine/checks/',
                     {
                         token:panToken,
-                        amount:amount,
-                        currency:currency,
-                        merchant:merchant,
+                        amount:fullRequestData.amount,
+                        currency:fullRequestData.currency,
+                        merchant:fullRequestData.merchant,
                         accountStatus:,
-                        customerID:,
+                        customerID: fullRequestData.customerID,
                     }
                 )
             }
