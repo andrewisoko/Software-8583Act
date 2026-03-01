@@ -21,10 +21,10 @@ export class RuleEngineService{
         try {
             let approved:boolean= false
 
-            const checkCustomerID = await this.partyRepository.findOne({where:{id:dataPayload.customerID}});
+            const checkCustomerID = await this.partyRepository.findOne({ where:{id:dataPayload.customerID }});
             if (! checkCustomerID ) throw new NotFoundException("customerID not found");
 
-            const checkMerchant = await this.terminalRepository.findOne({where:{subject: fullRequestData.merchant}});
+            const checkMerchant = await this.terminalRepository.findOne({ where:{subject: fullRequestData.merchant }});
             console.log(`merchant ${checkMerchant}`);
 
             if (! checkMerchant ) throw new NotFoundException("merchant not found");

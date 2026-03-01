@@ -4,6 +4,7 @@ import { RolesGuard } from "src/services/auth/roles/roles.guard";
 import { Roles } from "../auth/roles/roles.decorators";
 import { Role} from "../web_terminal/entity/wt.entity";
 import { RuleEngineService } from "./rule.engine.service";
+import { dataPayload } from "../orchestrator/transaction.service";
 
 
 
@@ -25,19 +26,19 @@ export class RuleEngineController{
         currency: string;
         merchant: string;
         accountStatus:string;
-        customerID: string;
+        customerID: dataPayload;
         }
     ){
    
 
     return await this.ruleEngineService.
-    enginechecks({
+    enginechecks(
+        {
         token:ruleEngineDto.token,
         amount:ruleEngineDto.amount,
         currency:ruleEngineDto.currency,
         merchant:ruleEngineDto.merchant,
-        accountStatus:ruleEngineDto.accountStatus,
-        customerID:ruleEngineDto.customerID
+        accountStatus:ruleEngineDto.accountStatus,  
     })   
-} 
+  } 
 }

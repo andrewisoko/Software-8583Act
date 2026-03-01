@@ -11,7 +11,7 @@ import { HttpService } from "@nestjs/axios";
 
 export interface dataPayload {
     token: string;
-    accountStatus:string;
+    accountStatus:"ACTIVE"|"BLOCKED"|"CLOSED";
     customerID: string;
     // location?
 
@@ -96,7 +96,7 @@ export class TransactionService{
     }
 
     async orchestrate( /* transaction service via httpService orchrstrates its operations */
-    fullRequestData:fullRequestData
+    fullRequestData:fullRequestData,
     ){
 
         try {
@@ -117,10 +117,12 @@ export class TransactionService{
 
             const panEncrypt = await this.transactionRepository.findOne({ where:{ panEncrypt:fullRequestData.pan } })
             if(! panEncrypt ) throw new NotFoundException("pan not found");
+            
 
-            const CustomerID = await this.partyRepository.findOne({ where:{ id: fullRequestData.customerID } });
-            if (! CustomerID ) throw new NotFoundException("customerID not found");
+            const CustomerId = await this.partyRepository.findOne({ where:{ id: fullRequestData.customerID } });
+            if (! CustomerId ) throw new NotFoundException("customerID not found");
 
+            
             const accountStatus = await this.accountRepository.findOne({ where:{ status:fullRequestData.accountStatus }})
             let panToken;
 
@@ -145,12 +147,12 @@ export class TransactionService{
                 return this.httpService.post(
                     'http://localhost:3002/api.gateway/rule-engine/checks/',
                     {
-                        token:panToken,
-                        amount:fullRequestData.amount,
-                        currency:fullRequestData.currency,
-                        merchant:fullRequestData.merchant,
-                        accountStatus:,
-                        customerID: fullRequestData.customerID,
+                        token: panToken,
+                        amount: fullRequestData.amount,
+                        currency: fullRequestData.currency,
+                        merchant: fullRequestData.merchant,
+                        accountStatus: dataPayload.accountStatus,
+                        customerID: dataPayload.customerID,
                     }
                 )
             }
