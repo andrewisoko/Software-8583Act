@@ -11,16 +11,15 @@ export class EncryptSecurity{
     constructor( private configService: ConfigService ) {
     const key = this.configService.get<string>('ENCRYPTION_KEY');
 
-    if (!key) {
-      throw new Error(`ENCRYPTION_KEY is not defined ${this.configService.get<string>('ENCRYPTION_KEY')}`);
-    }
+    if (!key) throw new Error(`ENCRYPTION_KEY is not defined ${this.configService.get<string>('ENCRYPTION_KEY')}`);
+    this.key = Buffer.from(key, 'hex');
+    
   }
 
   encrypt(text: string){
 
     const iv = crypto.randomBytes(12);
     const cipher = crypto.createCipheriv(this.algorithm, this.key, iv);
-  
     const encrypted = Buffer.concat([
       cipher.update(text, 'utf8'),
       cipher.final(),

@@ -1,4 +1,5 @@
-import { PrimaryGeneratedColumn,Column,Entity,CreateDateColumn } from "typeorm";
+import { PrimaryGeneratedColumn,Column,Entity,CreateDateColumn,OneToMany } from "typeorm";
+import { Transaction } from "src/services/orchestrator/entity/transaction.entity";
 
 export enum Role {
     CUSTOMER = "customer",
@@ -30,7 +31,10 @@ export class Terminal{
     })
     role:Role
 
- @CreateDateColumn({name:'timestamp'})
-    timestamp:Date
+    @CreateDateColumn({name:'timestamp'})
+         timestamp:Date
+
+    @OneToMany(() => Transaction, transaction => transaction.terminal)
+        transactions: Transaction[];
 
 }

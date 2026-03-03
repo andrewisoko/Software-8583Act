@@ -42,22 +42,22 @@ export class Transaction {
     @CreateDateColumn({ name:'timestamp' })
     timestamp:Date
 
-    @Column( "varchar", { length:5, default:"12/26" })
-    expiry:string;
+    @Column( 'text' )
+    expiryEncrypt:string;
     
-    @Column({nullable:true})
+    @Column( 'text' )
     panEncrypt:string;
-    
+ 
     @Column('varchar', {length: 25 ,default:"Merchant Tutorial"})
     merchant:string;
 
-    @ManyToOne(()=>Account,account =>account.id)
+    @ManyToOne(()=>Account,account =>account.transactions)
     account:Account; 
 
-    @ManyToOne(()=>Party,party =>party.fullName)
+    @ManyToOne(()=>Party,party =>party.transactions)
     customer:Party;
 
-    @ManyToOne(()=>Terminal,terminal =>terminal.signature)
+    @ManyToOne(()=>Terminal,terminal =>terminal.transactions)
     terminal:Terminal;
 }
 

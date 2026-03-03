@@ -40,7 +40,6 @@ export class TransactionService{
         amount,
         currency,
         merchant,
-        timestamp,
         customer,
         account,
         terminal,
@@ -48,40 +47,38 @@ export class TransactionService{
     }:FullRequestDto
 
     ){
-        const customerId = await this.partyRepository.findOne({where:{id:customer}})
-        if(! customerId ) throw new NotFoundException("Party not found");
+        try {
 
-        const accountId = await this.accountRepository.findOne({where:{id:account}})
-        if( ! accountId ) throw new NotFoundException("Account not found");
+            const customerData = await this.partyRepository.findOne({ where:{ id:customer }})
+            if(! customerData ) throw new NotFoundException("Party not found");
+       
+            const accountData = await this.accountRepository.findOne({ where:{ id:account }})
+            if( ! accountData ) throw new NotFoundException("Account not found");
 
-        const terminalId = await this.terminalRepository.findOne({where:{id:terminal}})
-        if(! terminalId ) throw new NotFoundException("terminal not found");
+            const terminalData = await this.terminalRepository.findOne({ where:{ id:terminal }})
+            if(! terminalData ) throw new NotFoundException("terminal not found");
 
-        const encryptedPan =  this.encryption.encrypt(pan).toString()
-        const encryptExpiryDate =  this.encryption.encrypt(expiry).toString()
+            const encryptedPan = JSON.stringify(this.encryption.encrypt(pan));
+            const encryptExpiryDate = JSON.stringify(this.encryption.encrypt(expiry));
 
-         try {
-             const data = await this.transactionRepository.create({
+            const transaction = await this.transactionRepository.create({
 
                 currency:currency,
                 amount:amount,
                 merchant:merchant,
-                timestamp:timestamp,
-                customer:customerId,
-                account:accountId,
-                terminal:terminalId,
+                customer:customerData,
+                account:accountData,
+                terminal:terminalData,
                 panEncrypt:encryptedPan,
-                expiry:encryptExpiryDate
-                 
+                expiryEncrypt:encryptExpiryDate,
                 })
-                console.log(`transaction data: ${data}`)
+                await this.transactionRepository.save(transaction)
+                return transaction
             
-         } catch (error) {
+        } catch (error) {
             console.log(`error: ${error}`)
          }   
-
-        return `transaction created`
-    }
+    };
 
     async orchestrate( /* transaction service via httpService orchestrates its operations */
     fullRequestData:FullRequestDto,
@@ -91,27 +88,23 @@ export class TransactionService{
             
             /* data from gateway-api to transaction service first hop */
     
-            await this.createTransaction({
-                pan:fullRequestData.pan,
-                expiry:fullRequestData.expiry,
-                amount:fullRequestData.amount,
-                currency:fullRequestData.currency,
-                merchant:fullRequestData.merchant,
-                timestamp:fullRequestData.timestamp,
-                customer:fullRequestData.customer,
-                account:fullRequestData.account,
-                terminal:fullRequestData.terminal,
-            })
+            // await this.createTransaction({
+            //     pan:fullRequestData.pan,
+            //     expiry:fullRequestData.expiry,
+            //     amount:fullRequestData.amount,
+            //     currency:fullRequestData.currency,
+            //     merchant:fullRequestData.merchant,
+            //     timestamp:fullRequestData.timestamp,
+            //     customer:fullRequestData.customer,
+            //     account:fullRequestData.account,
+            //     terminal:fullRequestData.terminal,
+            // })
 
-            const panEncrypt = await this.transactionRepository.findOne({ where:{ panEncrypt:fullRequestData.pan } })
-            if(! panEncrypt ) throw new NotFoundException("pan not found");
-            
-            
-            const CustomerId = await this.partyRepository.findOne({ where:{ id: fullRequestData.customerID } });
-            if (! CustomerId ) throw new NotFoundException("customerID not found");
+            const trnData = await this.transactionRepository.findOne({ where:{ amount:fullRequestData.amount } }) /*bad practice, needs to change */
+            if(! trnData ) throw new NotFoundException("Transaction (TrnData) not found");
 
+            const panEncrypt = trnData.panEncrypt
             
-            const accountStatus = await this.accountRepository.findOne({ where:{ status:fullRequestData.accountStatus }})
             let panToken;
 
             /* transansaction service calls merchant service (Auth) */
@@ -126,7 +119,6 @@ export class TransactionService{
                 return this.httpService.post('http://localhost:3002/api.gateway/token/pan-tokenisation/',{panEncrypt}) /*test if jwt guard is needed */
             }
             panToken = tokenisePan()
-            console.log(panToken)
             console.log("Pan tokenised 🔐");
 
             /* and so on...*/
@@ -150,8 +142,6 @@ export class TransactionService{
         } catch (error) {
             console.log(`Error: ${error}`)
         }
-
-
     }
 
 }

@@ -1,4 +1,5 @@
-import { Entity,PrimaryColumn,Column,BeforeInsert, PrimaryGeneratedColumn } from "typeorm";
+import { Entity,PrimaryColumn,Column,BeforeInsert, PrimaryGeneratedColumn,OneToMany } from "typeorm";
+import { Transaction } from "src/services/orchestrator/entity/transaction.entity";
 
 
 export enum TIERS {
@@ -47,6 +48,9 @@ export class Party {
          }
     )
     status:STATUS;
+
+    @OneToMany(() => Transaction, transaction => transaction.customer)
+    transactions: Transaction[];
 
 }
 
