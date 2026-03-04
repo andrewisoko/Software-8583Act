@@ -15,8 +15,8 @@ export class TransactionController {
         private readonly transactionService: TransactionService
     ) {}
 
-    // @UseGuards(JwtAuthGuard, RolesGuard)
-    // @Roles(Role.TERMINAL)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.TERMINAL)
     @Post("orchestra")
     orchestrate(
         @Body() dataDto:FullRequestDto

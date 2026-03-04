@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { PassportModule } from "@nestjs/passport";
 import { Module } from "@nestjs/common";
 import { MerchantController } from "./merchant_service/merchant.controller";
-import { AuthService } from "./merchant_service/merchant.service";
+import { MechartService } from "./merchant_service/merchant.service";
 import { JwtStrategy } from "./jwt.strategy";
 
 /* initial auth approach will be a simple jwt authorisation. The app initially verifies if web POS terminal contains the token.*/
@@ -23,7 +23,7 @@ import { JwtStrategy } from "./jwt.strategy";
         })
     ], 
     controllers:[MerchantController],
-    providers:[AuthService,JwtStrategy]
+    providers:[MechartService,JwtStrategy]
 })
 
 export class AuthModule {}

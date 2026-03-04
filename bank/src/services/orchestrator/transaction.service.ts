@@ -8,6 +8,7 @@ import { Account } from "../account_service/entity/account.entity";
 import { EncryptSecurity } from "./encryption/encrypt.security";
 import { HttpService } from "@nestjs/axios";
 import { FullRequestDto } from "src/api_gateway/config/dto/request.data.dto";
+import { firstValueFrom } from 'rxjs';
 
 
 export interface EngineCheckRequest {
@@ -100,18 +101,29 @@ export class TransactionService{
             //     terminal:fullRequestData.terminal,
             // })
 
-            const trnData = await this.transactionRepository.findOne({ where:{ amount:fullRequestData.amount } }) /*bad practice, needs to change */
+            const trnData = await this.transactionRepository.findOne({ where:{ customer: { id: fullRequestData.customer }}});
             if(! trnData ) throw new NotFoundException("Transaction (TrnData) not found");
-
-            const panEncrypt = trnData.panEncrypt
             
+            const panEncrypt = trnData.panEncrypt;
+
+            const terminalToken = trnData.terminal.acc_token;
             let panToken;
+
 
             /* transansaction service calls merchant service (Auth) */
 
-            const validateTerminal = () => this.httpService.get('http://localhost:3002/api.gateway/auth/validation-terminal/')
+            const validateTerminal = () => this.httpService.get('http://localhost:3002/api.gateway/auth/validation-terminal/',
+                 {
+                    headers: {
+                    Authorization: `Bearer ${terminalToken}`,
+                    },
+                }
+            )
+            .subscribe(response => {
+                console.log(response.data);
+            });
             validateTerminal()
-            console.log("Web terminal validated ✅");
+            // console.log("Web terminal validated ✅");
 
             /* transansaction service calls tokenise token */
 
@@ -119,7 +131,7 @@ export class TransactionService{
                 return this.httpService.post('http://localhost:3002/api.gateway/token/pan-tokenisation/',{panEncrypt}) /*test if jwt guard is needed */
             }
             panToken = tokenisePan()
-            console.log("Pan tokenised 🔐");
+            // console.log("Pan tokenised 🔐");
 
             /* and so on...*/
 
@@ -142,6 +154,7 @@ export class TransactionService{
         } catch (error) {
             console.log(`Error: ${error}`)
         }
-    }
 
+    }
+    
 }

@@ -12,11 +12,14 @@ export class Terminal{
    @PrimaryGeneratedColumn('uuid')
         id: string;
 
+    @Column('text' , { default: "accesstokenGGtutorial" })
+        acc_token:string;
+
     @Column({ type:'integer',  default: 87671023 })
-    serialNumber:number;
+        serialNumber:number;
 
     @Column( 'varchar', { length:21, default:"1.2.840.113549.1.1.11"} )
-    signature:string;
+        signature:string;
 
     @Column( 'varchar', { length:20, default:"Tutorial Bank"} )
     issuer:string;
@@ -32,7 +35,7 @@ export class Terminal{
     role:Role
 
     @CreateDateColumn({name:'timestamp'})
-         timestamp:Date
+        timestamp:Date
 
     @OneToMany(() => Transaction, transaction => transaction.terminal)
         transactions: Transaction[];

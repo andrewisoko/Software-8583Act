@@ -7,7 +7,7 @@ import { Role } from "./entity/wt.entity";
 
 
 
-Injectable()
+@Injectable()
 export class WebTerminal{
     constructor(
         @InjectRepository(Terminal) private readonly TerminalRepository: Repository<Terminal>,
@@ -35,14 +35,13 @@ export class WebTerminal{
         return objWithDots()
     }
 
-
-        
+   
     async CreateWT(){
 
         const serialNumber = this.generateSerialNum();
         // console.log(serialNumber)
         const signature = this.generateSignature();
-
+        
         const certTerminal = {
             serialNumber: serialNumber,
             signature: signature,
@@ -53,7 +52,10 @@ export class WebTerminal{
         const terminal_token = this.jwtService.sign(certTerminal);
 
         const terminalEntity = await this.TerminalRepository.create(certTerminal);
+        terminalEntity.acc_token = terminal_token
+        
         await this.TerminalRepository.save(terminalEntity);
+        // await this.TerminalRepository.save({ acc_token:terminal_token })
 
         return {terminal_token:terminal_token}
 
