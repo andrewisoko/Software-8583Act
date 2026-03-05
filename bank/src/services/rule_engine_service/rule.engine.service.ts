@@ -17,16 +17,16 @@ export class RuleEngineService{
         engineCheckRequest: EngineCheckRequest
         ){
         
+        let approved:boolean= false;
+
         try {
-            let approved:boolean= false
 
             const checkCustomerID = await this.partyRepository.findOne({ where:{ id:engineCheckRequest.customerID }});
             if (! checkCustomerID ) throw new NotFoundException("customerID not found");
 
             const checkMerchant = await this.terminalRepository.findOne({ where:{subject: engineCheckRequest.merchant }});
-            console.log(`merchant ${checkMerchant}`);
-
             if (! checkMerchant ) throw new NotFoundException("merchant not found");
+
             if ( engineCheckRequest.accountStatus !== "ACTIVE" ) throw new UnauthorizedException("account not active")
             
             if( engineCheckRequest.amount >= 150000 ) throw new UnauthorizedException("Invalid amount");  /*balance check to be added.*/
@@ -42,6 +42,7 @@ export class RuleEngineService{
             console.log( `Error: ${error}` );
             
         }
+
     };
 
 };

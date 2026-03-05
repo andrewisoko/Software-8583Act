@@ -74,6 +74,7 @@ export class TransactionService{
                 expiryEncrypt:encryptExpiryDate,
                 })
                 await this.transactionRepository.save(transaction)
+
                 return transaction
             
         } catch (error) {
@@ -87,56 +88,66 @@ export class TransactionService{
 
         try {
             
-            /* data from gateway-api to transaction service first hop */
+            /* data from gateway-api to transaction service first hop*/
     
-            // await this.createTransaction({
-            //     pan:fullRequestData.pan,
-            //     expiry:fullRequestData.expiry,
-            //     amount:fullRequestData.amount,
-            //     currency:fullRequestData.currency,
-            //     merchant:fullRequestData.merchant,
-            //     timestamp:fullRequestData.timestamp,
-            //     customer:fullRequestData.customer,
-            //     account:fullRequestData.account,
-            //     terminal:fullRequestData.terminal,
-            // })
+            const transaction = await this.createTransaction({
+                pan:fullRequestData.pan,
+                expiry:fullRequestData.expiry,
+                amount:fullRequestData.amount,
+                currency:fullRequestData.currency,
+                merchant:fullRequestData.merchant,
+                timestamp:fullRequestData.timestamp,
+                customer:fullRequestData.customer,
+                account:fullRequestData.account,
+                terminal:fullRequestData.terminal,
+            })
 
-            const trnData = await this.transactionRepository.findOne({ where:{ customer: { id: fullRequestData.customer }}});
-            if(! trnData ) throw new NotFoundException("Transaction (TrnData) not found");
-            
-            const panEncrypt = trnData.panEncrypt;
+            if (! transaction) throw new Error ("failed transaction")
 
-            const terminalToken = trnData.terminal.acc_token;
+        
+
+            const panEncryptParse = JSON.parse(transaction.panEncrypt);
+            const terminalToken = transaction.terminal.acc_token
             let panToken;
 
 
             /* transansaction service calls merchant service (Auth) */
 
-            const validateTerminal = () => this.httpService.get('http://localhost:3002/api.gateway/auth/validation-terminal/',
-                 {
-                    headers: {
+            const validateTerminalResponse = await firstValueFrom(
+            this.httpService.get(
+                'http://localhost:3002/api.gateway/auth/validation-terminal/',
+                {
+                headers: {
                     Authorization: `Bearer ${terminalToken}`,
                     },
-                }
-            )
-            .subscribe(response => {
-                console.log(response.data);
-            });
-            validateTerminal()
-            // console.log("Web terminal validated ✅");
+                },
+            ),
+            );
+            console.log(validateTerminalResponse.data);
 
             /* transansaction service calls tokenise token */
+           
+            const tokenResponse = await firstValueFrom(
 
-            const tokenisePan = () => {
-                return this.httpService.post('http://localhost:3002/api.gateway/token/pan-tokenisation/',{panEncrypt}) /*test if jwt guard is needed */
-            }
-            panToken = tokenisePan()
-            // console.log("Pan tokenised 🔐");
+            this.httpService.post(
+                'http://localhost:3002/api.gateway/token/pan-tokenisation/',
+                { panEncrypt: panEncryptParse },
+                 {
+                headers: {
+                    Authorization: `Bearer ${terminalToken}`,
+                    },
+                },
+
+                )
+            );
+
+            panToken = tokenResponse.data;
+            // console.log(panToken);
 
             /* and so on...*/
 
-            const ruleEngine = () => {
-                return this.httpService.post(
+            const ruleEngine = await firstValueFrom(
+                    this.httpService.post(
                     'http://localhost:3002/api.gateway/rule-engine/checks/',
                     {
                         token: panToken,
@@ -145,10 +156,17 @@ export class TransactionService{
                         merchant: fullRequestData.merchant,
                         accountStatus: fullRequestData.accountStatus,
                         customerID: fullRequestData.customerID,
-                    }
+                    },
+                    {
+                     headers: {
+                    Authorization: `Bearer ${terminalToken}`,
+                    },
+                 },
                 )
-            }
-            ruleEngine()
+            ); 
+            console.log("rule engine:", ruleEngine.data);
+        
+       
 
 
         } catch (error) {

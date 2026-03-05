@@ -15,35 +15,14 @@ export class TransactionController {
         private readonly transactionService: TransactionService
     ) {}
 
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.TERMINAL)
-    @Post("orchestra")
+    
+    @Post("orchestra") 
     orchestrate(
         @Body() dataDto:FullRequestDto
     ) {
-        // const { 
-        //     pan,
-        //     expiry, 
-        //     amount, 
-        //     currency, 
-        //     merchant, 
-        //     timestamp, 
-        //     customer, 
-        //     account, 
-        //     terminal
-        // } = req.customer
-
         return this.transactionService.orchestrate(dataDto)
     }
 }
 
-// pan:pan,
-// expiry:expiry,
-// amount:amount,
-// currency:currency, 
-// merchant:merchant, 
-// timestamp:timestamp, 
-// customer:customer, 
-// account:account, 
-// terminal:terminal
+
 
