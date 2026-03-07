@@ -1,4 +1,4 @@
-import { PrimaryGeneratedColumn,Column,Entity,CreateDateColumn,OneToOne} from "typeorm";
+import { PrimaryGeneratedColumn,Column,Entity,CreateDateColumn,OneToOne,JoinColumn} from "typeorm";
 import { Transaction } from "src/services/orchestrator/entity/transaction.entity";
 
 export enum DECISION  {
@@ -25,6 +25,7 @@ export class RuleEngine{
         timestamp:Date
 
     @OneToOne(() => Transaction, transaction => transaction.ruleEngine)
+    @JoinColumn()
         transaction: Transaction;
 
 }

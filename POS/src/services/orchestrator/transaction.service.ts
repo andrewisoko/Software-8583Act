@@ -10,10 +10,11 @@ import { HttpService } from "@nestjs/axios";
 import { FullRequestDto } from "src/api_gateway/config/dto/request.data.dto";
 import { firstValueFrom } from 'rxjs';
 import { RuleEngine } from "../rule_engine_service/entity/rule.engine.entity";
+import { IssuerService } from "../auth/banks/issuer_service/issuer.service";
 
 
 export interface EngineCheckRequest {
-    token: string;
+    panToken: string;
     amount: number;
     currency: string;
     merchant: string;
@@ -27,6 +28,7 @@ export interface AcquirerRequest {
     terminalid: string,
     merchant: string,
     currency:string,
+    exiprationDate:string,
 }
 
 
@@ -42,6 +44,7 @@ export class TransactionService{
 
         private readonly encryption:EncryptSecurity,
         private readonly httpService: HttpService,
+        private readonly issuerService:IssuerService
 
     ){}
 
@@ -167,7 +170,8 @@ export class TransactionService{
             panToken = tokenResponse.data;
             // console.log(panToken);
 
-            /* and so on...*/
+           
+            /* transansaction service calls rule engine. */
 
             const ruleEngine = await firstValueFrom(
                     this.httpService.post(
@@ -188,9 +192,37 @@ export class TransactionService{
                 )
             ); 
             console.log("rule engine:", ruleEngine.data);
-            
-            const ruleEngineTable = await this.createRuleEngineTable(ruleEngine,transaction);
-            transaction.ruleEngine = ruleEngineTable
+
+            // const decision = ruleEngine.data["action"]
+            // const ruleEngineTable = await this.createRuleEngineTable(decision,transaction);
+            // transaction.ruleEngine = ruleEngineTable;
+
+
+            /*banks talking to each other */
+
+
+            const acquirerService = await firstValueFrom(
+                this.httpService.post(
+                     'http://localhost:3002/api.gateway/acquirer/bank/',
+                    {
+                        amount:transaction.amount,
+                        pan: transaction.panEncrypt,
+                        terminalid:transaction.terminal.id,
+                        merchant: transaction.merchant,
+                        currency: transaction.currency,
+                        exiprationDate: transaction.expiryEncrypt
+        
+                    },
+                    {
+                     headers: {
+                    Authorization: `Bearer ${terminalToken}`,
+                    },
+                 },
+
+                )
+            )
+
+            const issuerService = this.issuerService.IssuerBankService()
 
 
         } catch (error) {

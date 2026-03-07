@@ -31,6 +31,7 @@
     "@types/passport-jwt": "^4.0.1",
     "bcrypt": "^6.0.0",
     "class-validator": "^0.15.1",
+    "iso_8583": "^2.6.7",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.18.0",

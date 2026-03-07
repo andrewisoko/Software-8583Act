@@ -20,7 +20,7 @@ export class TokenisationService {
         try {
             if(!encryptedPan) throw new NotFoundException("pan not found")
                 // console.log(pan)
-            const rawPan = this.decryption.decrypt(encryptedPan)
+            const rawPan = this.decryption.decrypt(encryptedPan);
             const token  = crypto.createHash('sha256').update(rawPan.toString()).digest('hex');
             
             console.log("Pan tokenised.")

@@ -45,8 +45,8 @@ export class WebTerminal{
         const certTerminal = {
             serialNumber: serialNumber,
             signature: signature,
-            issuer:'Tutorial Bank',
-            subject:'Merchant Tutorial',
+            issuer:'ISSUER BANK TUTORIAL',
+            subject:'TEST MERCHANT LONDON GB',
             role: Role.TERMINAL
         };
         const terminal_token = this.jwtService.sign(certTerminal);

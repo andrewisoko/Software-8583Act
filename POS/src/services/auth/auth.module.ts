@@ -6,6 +6,9 @@ import { MerchantController } from "./merchant_service/merchant.controller";
 import { MechartService } from "./merchant_service/merchant.service";
 import { JwtStrategy } from "./jwt.strategy";
 
+import { IssuerService } from './banks/issuer_service/issuer.service';
+
+
 /* initial auth approach will be a simple jwt authorisation. The app initially verifies if web POS terminal contains the token.*/
 
 @Module({
@@ -20,10 +23,10 @@ import { JwtStrategy } from "./jwt.strategy";
                     secret: configService.get<string>("JWT_KEY")
                 }
             },
-        })
+        }),
     ], 
     controllers:[MerchantController],
-    providers:[MechartService,JwtStrategy]
+    providers:[MechartService,JwtStrategy, IssuerService]
 })
 
 export class AuthModule {}

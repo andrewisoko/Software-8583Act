@@ -1,4 +1,4 @@
-import { PrimaryGeneratedColumn,Column,Entity,CreateDateColumn,OneToMany } from "typeorm";
+import { PrimaryColumn,Column,Entity,CreateDateColumn,OneToMany } from "typeorm";
 import { Transaction } from "src/services/orchestrator/entity/transaction.entity";
 
 export enum Role {
@@ -9,7 +9,12 @@ export enum Role {
 @Entity("Terminal")
 export class Terminal{
 
-   @PrimaryGeneratedColumn('uuid')
+   @PrimaryColumn({
+        type: 'varchar',
+        unique: true,
+        default: () => `'TERMID0' || nextval('terminal_sequence')`
+        }
+   )
         id: string;
 
     @Column('text' , { default: "accesstokenGGtutorial" })
@@ -21,10 +26,10 @@ export class Terminal{
     @Column( 'varchar', { length:21, default:"1.2.840.113549.1.1.11"} )
         signature:string;
 
-    @Column( 'varchar', { length:20, default:"Tutorial Bank"} )
+    @Column( 'varchar', { length:50, default:"ISSUER BANK"} )
     issuer:string;
 
-    @Column('varchar', { length:20, default:"Merchant Tutorial"} )
+    @Column('varchar', { length: 50, default:"TEST MERCHANT LONDON GB"} )
     subject:string;
 
     @Column({

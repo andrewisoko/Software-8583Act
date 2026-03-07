@@ -15,6 +15,9 @@ import { AccountModule } from 'src/services/account_service/account.module';
 import { Account } from 'src/services/account_service/entity/account.entity';
 import { TokenisationModule } from 'src/services/tokenisation_service/tokenisation.module';
 import { HttpModule } from '@nestjs/axios';
+import { AcquirerModule } from 'src/services/auth/banks/acquirer_service/acquirer.module';
+import { RuleEngine } from 'src/services/rule_engine_service/entity/rule.engine.entity';
+import { Acquirer } from 'src/services/auth/banks/entity/acquirer.entity';
 
 
 
@@ -35,7 +38,8 @@ import { HttpModule } from '@nestjs/axios';
       AuthModule,
       AccountModule,
       HttpModule,
-      WTModule
+      WTModule,
+      AcquirerModule
     ],
     inject:[ConfigService],
     useFactory:(configService:ConfigService) => {
@@ -48,7 +52,14 @@ import { HttpModule } from '@nestjs/axios';
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
         synchronize:true,
-        entities:[Terminal,Party,Transaction,Account]
+        entities:[
+          Terminal,
+          Party,
+          Transaction,
+          Account,
+          RuleEngine,
+          Acquirer
+        ]
       }
     }
   })

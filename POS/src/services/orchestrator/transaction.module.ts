@@ -11,6 +11,8 @@ import { Party } from "../party_service/entity/party.entity";
 import { Account } from "../account_service/entity/account.entity";
 import { Terminal } from "../web_terminal/entity/wt.entity";
 import { RuleEngine } from "../rule_engine_service/entity/rule.engine.entity";
+import { IssuerService } from "../auth/banks/issuer_service/issuer.service";
+import { Coversion } from "../auth/banks/iso_val_conversions/conversions";
 
 
 @Module({
@@ -31,7 +33,10 @@ import { RuleEngine } from "../rule_engine_service/entity/rule.engine.entity";
     providers:[
         TokenisationService,
         TransactionService,
-        EncryptSecurity
+        IssuerService,
+        EncryptSecurity,
+        Coversion
+        
     ],
 })
 

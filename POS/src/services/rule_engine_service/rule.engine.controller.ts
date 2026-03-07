@@ -36,7 +36,7 @@ export class RuleEngineController{
         {
         accountStatus:ruleEngineDto.accountStatus,
         customerID:ruleEngineDto.customerID,
-        token:ruleEngineDto.token,
+        panToken:ruleEngineDto.token,
         amount:ruleEngineDto.amount,
         currency:ruleEngineDto.currency,
         merchant:ruleEngineDto.merchant,
