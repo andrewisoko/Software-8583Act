@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Transaction } from "./entity/transaction.entity";
+import { Transaction, TRANSACTION_STATUS } from "./entity/transaction.entity";
 import { Repository } from "typeorm";
 import { Party } from "../party_service/entity/party.entity";
 import { Terminal } from "../web_terminal/entity/wt.entity";
@@ -107,6 +107,11 @@ export class TransactionService{
         return this.ruleEngineRepository.save(ruleEngine)
     }
     
+    async createStan(){
+
+        const randomNum = Math.floor(Math.random() * 1000000);
+        console.log( randomNum)
+    }
     async orchestrate( /* transaction service via httpService orchestrates its operations */
     fullRequestData:FullRequestDto,
     ){
@@ -222,7 +227,10 @@ export class TransactionService{
                 )
             )
 
-            const issuerService = this.issuerService.IssuerBankService()
+            const issuerService = this.issuerService.IssuerBankService();
+
+            // console.log("issuer response", issuerService)
+
 
 
         } catch (error) {

@@ -7,8 +7,8 @@ import { RuleEngine } from "src/services/rule_engine_service/entity/rule.engine.
 
 export enum TRANSACTION_STATUS {
     PENDING = "pending",
-    COMPLETED = "completed",
-    FAILED = "failed",
+    APPROVED = "approved",
+    DECLINED = "declined",
     REFUNDED = "refunded"
 }
 
@@ -28,6 +28,9 @@ export class Transaction {
 
     @Column('decimal', { precision: 6, scale: 2, default: 100 })
     amount:number
+
+    @Column( 'decimal' ,{ default: 129347 })
+    stan:number /*Systems Trace Audit Number*/
 
       @Column({
         type:"enum",

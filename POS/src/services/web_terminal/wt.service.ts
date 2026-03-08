@@ -15,7 +15,7 @@ export class WebTerminal{
     ){}
 
     generateSerialNum(){
-        const randomNum = Math.floor(Math.floor(Math.random() * 999999 + 10000000))
+        const randomNum = Math.floor(Math.random() * 100000000);
         return randomNum
       }
 

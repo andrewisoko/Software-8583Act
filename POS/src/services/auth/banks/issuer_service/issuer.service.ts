@@ -31,6 +31,7 @@ export class IssuerService {
 
     IssuerBankService(){
 
+        let responseCode = "00";
         const net = require('net');
 
         const server = net.createServer((socket) => {
@@ -40,35 +41,34 @@ export class IssuerService {
             console.log("Received ISO message:", data.toString('hex'));
 
             const isoMsg = this.parseIsoMessage(data);
-
+            
             /*Authorisation process */
             const bank = this.bankParty.getBankParty();
-            let responseCode = "00";
-            
+
             const amount = this.convertToVal.reverseIsoAmount(isoMsg[4])
             const expiryDate = this.convertToVal.reverseExpiry(isoMsg[14])
             const pan = isoMsg[2]
             
-             console.log(` isoAmount: ${amount}`)
-             console.log(` expiryDate: ${expiryDate}`)
-             console.log(` pan: ${pan}`)
-             console.log(` balance: ${bank.BALANCE}`)
-             console.log(` bank Exp: ${bank.EXPIRY}`)
-             console.log(` bank pan: ${bank.PAN}`)
+            //  console.log(` isoAmount: ${amount}`)
+            //  console.log(` expiryDate: ${expiryDate}`)
+            //  console.log(` pan: ${pan}`)
+            //  console.log(` balance: ${bank.BALANCE}`)
+            //  console.log(` bank Exp: ${bank.EXPIRY}`)
+            //  console.log(` bank pan: ${bank.PAN}`)
 
 
-            if(amount >= bank.BALANCE || expiryDate !== bank.EXPIRY || pan !== bank.PAN){
+            if(amount > bank.BALANCE || expiryDate !== bank.EXPIRY || pan !== bank.PAN){
                 responseCode = "51"
-                console.log(`response: ${responseCode}`)
             }
-            // return responseCode;
             console.log(`response: ${responseCode}`)
-           
+            
              });
 
         });
         server.listen(5000, () => {
         console.log("ISO8583 server running on port 5000");
         });
+
     };
+
 }
