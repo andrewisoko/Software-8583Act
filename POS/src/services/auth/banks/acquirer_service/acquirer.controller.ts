@@ -24,7 +24,8 @@ export class AcquirerController {
             merchant: string,
             currency:string,
             exiprationDate:string,
-            transactionId:string
+            transactionId:string,
+            stan:number
         }
     ){
         this.acquirerService.acquirerBankService({
@@ -34,6 +35,7 @@ export class AcquirerController {
             merchant: dataDto.merchant,
             currency: dataDto.currency,
             exiprationDate:dataDto.exiprationDate,
+            stan:dataDto.stan
         })
     }
 }

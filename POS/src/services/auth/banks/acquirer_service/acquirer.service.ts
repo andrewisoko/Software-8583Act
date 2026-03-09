@@ -47,6 +47,8 @@ export class AcquirerService {
         const rawExpDate = this.encryptSecurity.decrypt(expObject);
         
         const isoExpDate = this.convertInIsoVal.formatExpiry(rawExpDate)
+
+        const stanString = acqData.stan.toString()
         
         const acquirer = new net.Socket();
         
@@ -58,7 +60,7 @@ export class AcquirerService {
                 2: rawPan,
                 3: '000000', /*processing code*/
                 4: isoAmount,
-                11: '123456', /*System Trace Audit Number.*/
+                11: stanString, /*System Trace Audit Number.*/
                 14: isoExpDate,
                 41: acqData.terminalid,
                 43: acqData.merchant.padEnd(40, " "),

@@ -8,13 +8,16 @@ import { JwtStrategy } from "./jwt.strategy";
 import { Conversion } from "./banks/iso_val_conversions/conversions";
 import { IssuerService } from './banks/issuer_service/issuer.service';
 import { PartyBankAccount } from "./banks/partyBankAccount";
-PartyBankAccount
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { Transaction } from "../orchestrator/entity/transaction.entity";
+
 
 
 /* initial auth approach will be a simple jwt authorisation. The app initially verifies if web POS terminal contains the token.*/
 
 @Module({
     imports:[
+        TypeOrmModule.forFeature([Transaction]),
         PassportModule,
         JwtModule.registerAsync({
             imports:[ConfigModule],

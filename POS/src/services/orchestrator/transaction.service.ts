@@ -29,6 +29,7 @@ export interface AcquirerRequest {
     merchant: string,
     currency:string,
     exiprationDate:string,
+    stan:number
 }
 
 
@@ -107,10 +108,9 @@ export class TransactionService{
         return this.ruleEngineRepository.save(ruleEngine)
     }
     
-    async createStan(){
-
+   createStan(){
         const randomNum = Math.floor(Math.random() * 1000000);
-        console.log( randomNum)
+        return randomNum
     }
     async orchestrate( /* transaction service via httpService orchestrates its operations */
     fullRequestData:FullRequestDto,
@@ -155,6 +155,9 @@ export class TransactionService{
             ),
             );
             console.log(validateTerminalResponse.data);
+
+            const stan = this.createStan()
+            transaction.stan = stan
 
             /* transansaction service calls tokenise token */
            
@@ -215,7 +218,8 @@ export class TransactionService{
                         terminalid:transaction.terminal.id,
                         merchant: transaction.merchant,
                         currency: transaction.currency,
-                        exiprationDate: transaction.expiryEncrypt
+                        exiprationDate: transaction.expiryEncrypt,
+                        stan:transaction.stan
         
                     },
                     {
@@ -226,10 +230,34 @@ export class TransactionService{
 
                 )
             )
-
             const issuerService = this.issuerService.IssuerBankService();
 
-            // console.log("issuer response", issuerService)
+            /*approval transaction process */
+            console.log("PENDING STATUS", transaction.status);
+            const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+            await sleep(2000);
+
+            const fs = require('fs');
+            const path = require('path');
+            
+         
+            const approvedFileJSON = path.join( __dirname,  '..', '..', '..', 'approved.json' );
+
+            console.log(approvedFileJSON);
+                            
+         
+            if ( ! fs.existsSync( approvedFileJSON )){
+               transaction.status = TRANSACTION_STATUS.DECLINED; 
+            }
+            else{
+                transaction.status = TRANSACTION_STATUS.APPROVED;
+                console.log("APPROVED", transaction.status)
+            }
+            fs.unlinkSync(approvedFileJSON);
+            console.log('File deleted successfully');
+
+
+
 
 
 
