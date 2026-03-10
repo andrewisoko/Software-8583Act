@@ -252,9 +252,9 @@ export class TransactionService{
             else{
                 transaction.status = TRANSACTION_STATUS.APPROVED;
                 console.log("APPROVED", transaction.status)
+                fs.unlinkSync(approvedFileJSON);
+                console.log('File deleted successfully');
             }
-            fs.unlinkSync(approvedFileJSON);
-            console.log('File deleted successfully');
 
 
 
