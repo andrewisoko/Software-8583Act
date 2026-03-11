@@ -8,11 +8,13 @@ import { Party } from "../party_service/entity/party.entity";
 
 
 
+
 @Injectable()
 export class RuleEngineService{
     // @InjectRepository(Transaction) private readonly transactionRepository:Repository<Transaction>;
     @InjectRepository(Terminal) private readonly terminalRepository:Repository<Terminal>;
     @InjectRepository(Party) private readonly partyRepository:Repository<Party>;
+    
 
     async enginechecks(
         engineCheckRequest: EngineCheckRequest

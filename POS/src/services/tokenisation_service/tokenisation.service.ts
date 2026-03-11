@@ -5,6 +5,15 @@ import { Transaction } from "../orchestrator/entity/transaction.entity";
 import { EncryptSecurity } from "../orchestrator/encryption/encrypt.security";
 
 
+export interface TokenRecord {
+  token: string;
+  rawPan: string;
+};
+
+export const vault: TokenRecord[] = []
+
+
+
 @Injectable()
 export class TokenisationService {
 
@@ -13,21 +22,31 @@ export class TokenisationService {
         private readonly decryption:EncryptSecurity
     ){}
 
+     store(record: TokenRecord, records: TokenRecord[] ) {
+        records.push(record);   
+    }
+
+
+    detokenisetoken(token:string){
+        return vault.find( r => r.token === token)?.rawPan
+    }
+
+
     /* PCI compliance to add  */
     tokenisePan(encryptedPan:string){
+
+    try {
+        if(!encryptedPan) throw new NotFoundException("pan not found")
+            // console.log(pan)
+        const rawPan = this.decryption.decrypt(encryptedPan);
+        const token = crypto.randomUUID();
+        this.store( { token, rawPan }, vault );
         
-        const crypto = require('crypto');
-        try {
-            if(!encryptedPan) throw new NotFoundException("pan not found")
-                // console.log(pan)
-            const rawPan = this.decryption.decrypt(encryptedPan);
-            const token  = crypto.createHash('sha256').update(rawPan.toString()).digest('hex');
-            
-            console.log("Pan tokenised.")
-            return token;
-            
-        } catch (error) {
-            console.log(`error ${error}`)
-        }
+        console.log("Pan tokenised.");
+        return token;
+        
+    } catch (error) {
+        console.log(`error ${error}`)
     }
+}
 }

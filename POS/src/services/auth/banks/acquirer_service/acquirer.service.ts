@@ -4,6 +4,7 @@ import { EncryptSecurity } from 'src/services/orchestrator/encryption/encrypt.se
 import { Conversion } from '../iso_val_conversions/conversions';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Acquirer } from '../entity/acquirer.entity';
+import { TokenisationService, vault } from 'src/services/tokenisation_service/tokenisation.service';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -11,8 +12,9 @@ export class AcquirerService {
     
     constructor(
         @InjectRepository(Acquirer) private readonly acquirerRepository:Repository<Acquirer>,
+         private readonly tokenService:TokenisationService,
         private readonly encryptSecurity: EncryptSecurity,
-        private readonly convertInIsoVal: Conversion
+        private readonly convertInIsoVal: Conversion,
     ){}
 
 
@@ -40,10 +42,14 @@ export class AcquirerService {
         
         const isoAmount = this.convertInIsoVal.toIsoAmount(acqData.amount);
 
-        const panObject = JSON.parse(acqData.panEncrypt)
-        const expObject =  JSON.parse(acqData.exiprationDate)
-        
-        const rawPan = this.encryptSecurity.decrypt(panObject);
+        // const panObject = JSON.parse(acqData.panToken)
+        const expObject =  JSON.parse(acqData.exiprationDate);
+
+        const rawPan = this.tokenService.detokenisetoken(acqData.panToken);
+
+
+        // console.log(typeof(rawPan));
+
         const rawExpDate = this.encryptSecurity.decrypt(expObject);
         
         const isoExpDate = this.convertInIsoVal.formatExpiry(rawExpDate)

@@ -23,6 +23,9 @@ export class Account{
 
     @Column({ length: 3, default: 'GBP' })
         currency: string;
+    
+    @Column( 'varchar',{ length:5, default:"12/28" })
+    expiryDate:string
 
     @Column({ default: 'ACTIVE' })
         status: 'ACTIVE' | 'BLOCKED' | 'CLOSED';

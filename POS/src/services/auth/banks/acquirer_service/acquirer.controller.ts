@@ -30,7 +30,7 @@ export class AcquirerController {
     ){
         this.acquirerService.acquirerBankService({
             amount:dataDto.amount,
-            panEncrypt: dataDto.pan,
+            panToken: dataDto.pan,
             terminalid:dataDto.terminalid,
             merchant: dataDto.merchant,
             currency: dataDto.currency,

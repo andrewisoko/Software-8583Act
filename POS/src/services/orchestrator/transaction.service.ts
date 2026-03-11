@@ -11,6 +11,7 @@ import { FullRequestDto } from "src/api_gateway/config/dto/request.data.dto";
 import { firstValueFrom } from 'rxjs';
 import { RuleEngine } from "../rule_engine_service/entity/rule.engine.entity";
 import { IssuerService } from "../auth/banks/issuer_service/issuer.service";
+import { TokenRecord } from "../tokenisation_service/tokenisation.service";
 
 
 export interface EngineCheckRequest {
@@ -24,7 +25,7 @@ export interface EngineCheckRequest {
 
 export interface AcquirerRequest {
     amount:number,
-    panEncrypt:string,
+    panToken: string;
     terminalid: string,
     merchant: string,
     currency:string,
@@ -112,6 +113,9 @@ export class TransactionService{
         const randomNum = Math.floor(Math.random() * 1000000);
         return randomNum
     }
+
+    
+
     async orchestrate( /* transaction service via httpService orchestrates its operations */
     fullRequestData:FullRequestDto,
     ){
@@ -160,6 +164,7 @@ export class TransactionService{
             transaction.stan = stan
 
             /* transansaction service calls tokenise token */
+
            
             const tokenResponse = await firstValueFrom(
 
@@ -214,7 +219,7 @@ export class TransactionService{
                      'http://localhost:3002/api.gateway/acquirer/bank/',
                     {
                         amount:transaction.amount,
-                        pan: transaction.panEncrypt,
+                        pan: panToken,
                         terminalid:transaction.terminal.id,
                         merchant: transaction.merchant,
                         currency: transaction.currency,
@@ -235,7 +240,7 @@ export class TransactionService{
             /*approval transaction process */
             console.log("PENDING STATUS", transaction.status);
             const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-            await sleep(2000);
+            await sleep(3000);
 
             const fs = require('fs');
             const path = require('path');
