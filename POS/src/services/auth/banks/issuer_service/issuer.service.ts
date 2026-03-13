@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Conversion } from '../iso_val_conversions/conversions';
 import { ConfigService } from '@nestjs/config';
 import { PartyBankAccount } from '../partyBankAccount';
@@ -8,6 +8,7 @@ import { Transaction } from 'src/services/orchestrator/entity/transaction.entity
 import { EncryptSecurity } from 'src/services/orchestrator/encryption/encrypt.security';
 import { Account } from 'src/services/account_service/entity/account.entity';
 import { TRANSACTION_STATUS } from 'src/services/orchestrator/entity/transaction.entity';
+import { threadCpuUsage } from 'process';
 
 
 
@@ -19,7 +20,6 @@ export class IssuerService {
         @InjectRepository(Transaction) private readonly transactionRepository:Repository<Transaction>,
         @InjectRepository(Account) private readonly accountRepository:Repository<Account>,
         private readonly convertToVal: Conversion,
-        // private readonly bankParty: PartyBankAccount,
         private readonly encryption: EncryptSecurity,
     ){}
 
@@ -37,44 +37,45 @@ export class IssuerService {
 
         };
 
-    decrypPanByFullName(fullNameAcc:string){
-        return this.accountRepository
-        .findOne({ where: { fullName: fullNameAcc } })
-        .then(account => {
-            if (!account) {
-            throw new NotFoundException('Account not found');
-            }
+  
 
-            console.log(account.panEncrypt);
-        });
-                
-    }
+    async decryptPanByFullName(fullNameAcc: string) {
+
+        const account = await this.accountRepository.findOne({ where: { fullName: fullNameAcc } });
+        if (!account) throw new NotFoundException("account not found");
+
+            console.log("acc pan", typeof(account.panEncrypt))
+            const encryptedObj = JSON.parse(account.panEncrypt);
+             const rawPan = this.encryption.decrypt(encryptedObj);
+             
+            account.panEncrypt = rawPan;
+            await this.accountRepository.save(account);
+
+        return account
+
+        }
     
-    findAccountSync(pan:string){
-        const panEncrypt = JSON.stringify(this.encryption.encrypt(pan))
-        // return this.accountRepository.findOne({ where: {panEncrypt: '{"iv":"4f2619f4d6ffa083b5e582b9","content":"e64d7b0186b5d34ae8f9a5797bf3be03","tag":"25bbf1cafe417e3c81707fa25fa1ed54"}' }})
-        return this.accountRepository.findOne({ where: {panEncrypt: panEncrypt }})
-        .then( account => {
-            if(!account){
-                 throw new NotFoundException('Account not found');
-            };
-            return { 
-                "balance": account.balance,
-                "expiryDate": account.expiryEncrypt,
-                "panEncrypt":account.panEncrypt,
-            }
-        });
+    async findAccount(pan:string,fullName:string){
+
+        await this.decryptPanByFullName(fullName);
+
+            const account = await this.accountRepository.findOne({ where: {panEncrypt: pan }});
+            if (!account) throw new NotFoundException("account not found");
+
+            const panEncrypt = JSON.stringify(this.encryption.encrypt(pan));
+            account.panEncrypt = panEncrypt;
+            await this.accountRepository.save(account);
+
+        return account
     };
 
-    findTransactionSync(stan:number){
-        return this.transactionRepository.findOne({ where:{ stan:stan } })
-          .then( transaction => {
-            if( ! transaction ){
-                 throw new NotFoundException('Transaction not found');
-            };
-            return {"status": transaction.status }
-        });
-    }
+    async findTransaction(stan:number){
+
+        const transaction =  await this.transactionRepository.findOne({ where:{ stan:stan } }) 
+        if (!transaction) throw new NotFoundException( "transaction not found" );
+
+        return transaction
+    };
 
     IssuerBankService(){
 
@@ -84,7 +85,7 @@ export class IssuerService {
 
         const server = net.createServer((socket) => {
 
-        socket.on('data', (data) => {
+        socket.on('data',async (data) => {
 
             console.log("Received ISO message:", data.toString('hex'));
 
@@ -92,64 +93,73 @@ export class IssuerService {
             const isoMsg = this.parseIsoMessage(data);
             
             /*Authorisation process */
-            // const bank = this.bankParty.getBankParty();
             
-            const pan = isoMsg[2]
-            const stan = Number( isoMsg[11] )
-            const amount = this.convertToVal.reverseIsoAmount(isoMsg[4])
-            const expiryDate = this.convertToVal.reverseExpiry(isoMsg[14])
+            const pan = isoMsg[2];
+            const fullName = isoMsg[45];
+            const stan = Number( isoMsg[11] );
             
-            const account = this.findAccountSync(pan)
-            
-            const transaction = this.findTransactionSync(stan)
-            
-            const decc = this.decrypPanByFullName('Johnson Handsome')
-            console.log("decrpt", decc)
-           
-            
-            //  console.log(` isoAmount: ${amount}`)
-            //  console.log(` expiryDate: ${expiryDate}`)
-            //  console.log(` pan: ${pan}`)
-            //  console.log(` balance: ${bank.BALANCE}`)
-            //  console.log(` bank Exp: ${bank.EXPIRY}`)
-            //  console.log(` bank pan: ${bank.PAN}`)
 
+            const amount = this.convertToVal.reverseIsoAmount(isoMsg[4]);
+            const expiryDate = this.convertToVal.reverseExpiry(isoMsg[14]);
+            
+            const account =  await this.findAccount(pan,fullName);
+            const transaction = await this.findTransaction(stan);
 
-            if(amount <= account["balance"] || expiryDate == account["expiryDate"] || pan == account["panEncrypt"]){
+            const expObj = JSON.parse(account.expiryEncrypt);
+            const panObj = JSON.parse(account.panEncrypt);
+
+            const accountExpDateDecrypted = this.encryption.decrypt(expObj);
+            const accPanDecrypted = this.encryption.decrypt(panObj);
+            const availableBalance = account.ledger_balance - amount
+            
+            await this.accountRepository.decrement({ id: account.id },'ledger_balance', amount);
+            await this.accountRepository.increment({ id: account.id },'available_balance', availableBalance);
+            await this.accountRepository.increment({ id: account.id },'hold', amount);
+
+                
+            if(
+                amount < account.ledger_balance 
+                || expiryDate == accountExpDateDecrypted 
+                || pan == accPanDecrypted
+                || account.status !== "ACTIVE"
+            ){
                 responseCode = "00"
+                
+                transaction.status = TRANSACTION_STATUS.APPROVED
 
-                transaction["status"] = TRANSACTION_STATUS.APPROVED
+                account.hold = 0
+                await this.accountRepository.decrement({ id: account.id },'ledger_balance', amount);
+                await this.accountRepository.increment({ id: account.id },'available_balance', availableBalance);
+                
+                await this.accountRepository.save(account)
+                await this.transactionRepository.save(transaction)
                 
                 console.log({
                     "Authorisation_code": "9384FDC",
                     "Response_code": responseCode,
                     "Reason": "All data vaildated."
                 })
+                
+                console.log(`response: ${responseCode}`);
+
+            }
+            else{
+                transaction.status = TRANSACTION_STATUS.DECLINED;
+
+                await this.accountRepository.save(account);
+                await this.transactionRepository.save(transaction);
+                console.log(`response: ${responseCode}`);
+            }
             
-    
-
-            // const json = JSON.stringify(responseApporved, null, 2);  /* not the most elegant of the approaches */
-
-            //     fs.writeFile('approved.json', json, 'utf8', (err) => {
-            //         if (err) {
-            //             console.error('Error writing file:', err);
-            //         }
-            //         console.log('JSON file created: approved.json');
-            //         });
-    
-            };
-            console.log(`response: ${responseCode}`)
-
-
-            
-            });
-            
-
         });
-        server.listen(5000, () => {
+        
+        
+    });
+    server.listen(5000, () => {
         console.log("ISO8583 server running on port 5000");
-        });
-
-    };
+    });
+    
+};
 
 }
+

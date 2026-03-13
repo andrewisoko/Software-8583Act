@@ -125,7 +125,7 @@ export class TransactionService{
             
             /* data from gateway-api to transaction service first hop*/
 
-            // const account =  await this.accountRepository.findOne({ where: {fullName: 'Johnson Handsome' }})
+            // const account =  await this.accountRepository.findOne({ where: {panEncrypt: '{"iv":"4f2619f4d6ffa083b5e582b9","content":"e64d7b0186b5d34ae8f9a5797bf3be03","tag":"25bbf1cafe417e3c81707fa25fa1ed54"}' }})
             // console.log("account ", account)
     
             const transaction = await this.createTransaction({
@@ -164,6 +164,7 @@ export class TransactionService{
 
             const stan = this.createStan()
             transaction.stan = stan
+            await this.transactionRepository.save(transaction)
 
             /* transansaction service calls tokenise token */
 
@@ -238,8 +239,13 @@ export class TransactionService{
 
                 )
             )
+            console.log("trans status before", transaction.status);
             const issuerService = this.issuerService.IssuerBankService();
 
+            const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+            await sleep(2000);
+
+            console.log("trans status after", transaction.status);
 
             /*approval transaction process */
 

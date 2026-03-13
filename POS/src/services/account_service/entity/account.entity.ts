@@ -19,7 +19,10 @@ export class Account{
         customerId: string;     
 
     @Column({ type: 'decimal', precision: 15, scale: 2, default: 0 })
-        balance: number;              
+        ledger_balance: number;  
+
+    @Column({ type: 'decimal', precision: 15, scale: 2, default: 0 })
+        available_balance: number;              
 
     @Column({ type: 'decimal', precision: 15, scale: 2, default: 0 })
         hold: number;               
