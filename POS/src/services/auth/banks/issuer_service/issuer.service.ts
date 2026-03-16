@@ -36,6 +36,9 @@ export class IssuerService {
         };
 
   
+    /* function that sends the metadata payload to legdger service  */
+    /* adjust the issuer logic and move the account related function to account service */
+    /* internal calls to ledger and account service. */
 
     async decryptPanByFullName(fullNameAcc: string) {
 
@@ -197,7 +200,7 @@ export class IssuerService {
 
             /* COMPENSATION STEP */
 
-            // await this.releaseHold(account.id, amount);
+            await this.releaseHold(account.id, amount);
 
             throw error;
         }

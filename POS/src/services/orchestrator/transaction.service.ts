@@ -245,7 +245,7 @@ export class TransactionService{
             await sleep(2000);  /*waits for response */
 
 
-          
+          /* publishing event on kafka, notification service, ledger service settlement service react to it */
 
 
 
