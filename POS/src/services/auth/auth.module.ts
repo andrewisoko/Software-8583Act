@@ -14,6 +14,7 @@ import { EncryptSecurity } from "../orchestrator/encryption/encrypt.security";
 import { Account } from "../account_service/entity/account.entity";
 import { HttpModule } from "@nestjs/axios";
 import { AccountService } from "../account_service/account.service";
+import { Ledger } from "../ledger.service/entity/ledger.entity";
 
 
 
@@ -21,7 +22,7 @@ import { AccountService } from "../account_service/account.service";
 
 @Module({
     imports:[
-        TypeOrmModule.forFeature([Transaction,Account]),
+        TypeOrmModule.forFeature([Transaction,Account,Ledger]),
         PassportModule,
         HttpModule,
         JwtModule.registerAsync({

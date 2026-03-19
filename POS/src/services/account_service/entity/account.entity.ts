@@ -1,6 +1,8 @@
 import { Entity,PrimaryGeneratedColumn,Column,CreateDateColumn,UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from "typeorm";
 import { Party } from "src/services/party_service/entity/party.entity";
 import { Transaction } from "src/services/orchestrator/entity/transaction.entity";
+import { Ledger } from "src/services/ledger.service/entity/ledger.entity";
+
 
 
 @Entity("Account")
@@ -44,6 +46,12 @@ export class Account{
 
     @OneToMany(() => Transaction, transaction => transaction.customer)
         transactions: Transaction[];
+
+    @OneToMany(() => Ledger, ledger => ledger.account)
+        ledgerEntries: Ledger[];
+
+    @OneToMany(() => Ledger, ledger =>  ledger.idempotency_key)
+        ledgers: Ledger[];
 
     @ManyToOne(() => Party)
         @JoinColumn({ name: 'customer_id' })

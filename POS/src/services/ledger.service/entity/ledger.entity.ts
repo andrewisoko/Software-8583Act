@@ -1,10 +1,6 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  Index,
-  CreateDateColumn
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Index, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Transaction } from 'src/services/orchestrator/entity/transaction.entity';
+import { Account } from 'src/services/account_service/entity/account.entity';
 
 export enum LedgerDirection {
   DEBIT = 'DEBIT',
@@ -19,7 +15,7 @@ export enum LedgerEntryType {
 }
 
 @Entity('ledger_entries')
-export class LedgerEntry {
+export class Ledger {
 
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -27,19 +23,20 @@ export class LedgerEntry {
   @Column()
   entry_id: string;
 
- 
+
+  
   @Column()
   transaction_id: string;
-
+  
   @Column()
   account_id: string;
-
-  @Column('decimal', { precision: 6, scale: 2, default: 100 })
+  
+  @Column('decimal', { precision: 15, scale: 2 })
   amount: number;
-
-  @Column({ length: 3 })
+  
+  @Column('varchar', { length: 3, default: "GBP" })
   currency: string;
-
+  
   @Column({
     type: 'enum',
     enum: LedgerDirection
@@ -51,17 +48,26 @@ export class LedgerEntry {
     enum: LedgerEntryType
   })
   entry_type: LedgerEntryType;
-
+  
   @Column({ type: 'timestamptz' })
   event_timestamp: Date;
-
+  
   @Column({ length: 19 })
   masked_pan: string;
-
+  
   @Index({ unique: true })
   @Column()
   idempotency_key: string;
-
+  
   @CreateDateColumn()
   created_at: Date;
+  
+  @ManyToOne(() => Account, account => account.ledgerEntries, { nullable: false })
+  @JoinColumn({ name: 'account_id' })
+  account: Account;
+
+  @ManyToOne(() => Transaction, transaction => transaction.ledgerEntries, { nullable: false })
+  @JoinColumn({ name: 'transaction_id' })
+  transaction: Transaction;
+
 }

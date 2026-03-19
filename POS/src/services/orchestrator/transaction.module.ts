@@ -16,6 +16,7 @@ import { Conversion } from "../auth/banks/iso_val_conversions/conversions";
 import { PartyBankAccount } from "../auth/banks/partyBankAccount";
 import { ConfigService } from "@nestjs/config";
 import { AccountService } from "../account_service/account.service";
+import { Ledger } from "../ledger.service/entity/ledger.entity";
 
 
 @Module({
@@ -26,7 +27,8 @@ import { AccountService } from "../account_service/account.service";
             Party,
             Account,
             Terminal,
-            RuleEngine
+            RuleEngine,
+            Ledger
         ])
     ],
     controllers:[
