@@ -209,9 +209,9 @@ export class TransactionService{
             ); 
             console.log("rule engine:", ruleEngine.data);
 
-            const decision = ruleEngine.data["action"]
-            const ruleEngineTable = await this.createRuleEngineTable(decision,transaction);
-            transaction.ruleEngine = ruleEngineTable;
+            // const decision = ruleEngine.data["action"]
+            // const ruleEngineTable = await this.createRuleEngineTable(decision,transaction);
+            // transaction.ruleEngine = ruleEngineTable;
 
 
             /*banks talking to each other */

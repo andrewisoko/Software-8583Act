@@ -11,6 +11,7 @@ export enum TRANSACTION_STATUS {
     PENDING = "pending",
     APPROVED = "approved",
     DECLINED = "declined",
+    SETTLED = "settled",
     REFUNDED = "refunded"
 }
 
@@ -34,7 +35,7 @@ export class Transaction {
     @Column( 'decimal' ,{ default: 129347 })
     stan:number /*Systems Trace Audit Number*/
 
-      @Column({
+    @Column({
         type:"enum",
         enum:TRANSACTION_STATUS,
         default:TRANSACTION_STATUS.PENDING,

@@ -151,7 +151,6 @@ export class IssuerService {
                     /* COMPENSATION STEP */
 
                     await this.releaseHold(account.id, amount);
-
                     throw error;
                 }
         
