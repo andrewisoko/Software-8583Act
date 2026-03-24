@@ -12,7 +12,8 @@ export class LedgerController {
         private readonly ledgerService: LedgerService
     ){}
 
-
+    @UseGuards(JwtAuthGuard,RolesGuard)
+    @Roles(Role.ISSUER)
     @Post("double-entry")
     async saveDoubleEntry(
         @Body() ledgerdataDto: {

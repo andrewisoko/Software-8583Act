@@ -8,7 +8,8 @@ import { TRANSACTION_STATUS } from 'src/services/orchestrator/entity/transaction
 import { AccountService} from 'src/services/account_service/account.service';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
-
+import { JwtService } from '@nestjs/jwt';
+import { Role } from 'src/services/web_terminal/entity/wt.entity';
 
 
 
@@ -22,6 +23,7 @@ export class IssuerService {
         private readonly accountService: AccountService,
         private readonly convertToVal: Conversion,
         private readonly httpService: HttpService,
+        private readonly jwtService:JwtService,
     ){}
 
     
@@ -102,7 +104,12 @@ export class IssuerService {
             
             const account =  await this.accountService.findAccount(pan,fullName);
             const transaction = await this.findTransaction(stan);
-       
+            
+            const issuerToken = this.jwtService.sign({
+                account:account.id,
+                stan:stan,
+                role:Role.ISSUER
+            })
             
             
             /*Authorisation process */
@@ -117,6 +124,11 @@ export class IssuerService {
                         transaction:transaction,
                         expiryDate:expiryDate,
                         pan:pan
+                    },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${issuerToken}`
+                        }
                     }
                  )) 
 
@@ -169,6 +181,11 @@ export class IssuerService {
                    currency:"GBP",
                    eventTimestamp:eventTimeStamp,
                    maskedPan:maskPan,
+               },
+               {
+                 headers:{
+                    Authorization: `Bearer ${issuerToken}`
+                 }
                }
                )) 
            console.log("Ledger service response", ledgerDoubleEntry.data)

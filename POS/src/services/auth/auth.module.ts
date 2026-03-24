@@ -1,10 +1,10 @@
-import { JwtModule } from "@nestjs/jwt";
+import { JwtModule, JwtService } from "@nestjs/jwt";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { PassportModule } from "@nestjs/passport";
 import { Module } from "@nestjs/common";
 import { MerchantController } from "./merchant_service/merchant.controller";
 import { MechartService } from "./merchant_service/merchant.service";
-import { JwtStrategy } from "./jwt.strategy";
+import { TerminalJwtStrategy } from "./terminal.jwt.strategy";
 import { Conversion } from "./banks/iso_val_conversions/conversions";
 import { IssuerService } from './banks/issuer_service/issuer.service';
 import { PartyBankAccount } from "./banks/partyBankAccount";
@@ -15,6 +15,7 @@ import { Account } from "../account_service/entity/account.entity";
 import { HttpModule } from "@nestjs/axios";
 import { AccountService } from "../account_service/account.service";
 import { Ledger } from "../ledger.service/entity/ledger.entity";
+import { IssuerJwtStrategy } from "./banks/issuer_service/Issuer.jwt.strategy";
 
 
 
@@ -31,7 +32,7 @@ import { Ledger } from "../ledger.service/entity/ledger.entity";
             useFactory:(configService:ConfigService) => {
                 return{
                     global: true,
-                    secret: configService.get<string>("JWT_KEY")
+                    secret: configService.get<string>("JWT_KEY"),
                 }
             },
         }),
@@ -39,7 +40,9 @@ import { Ledger } from "../ledger.service/entity/ledger.entity";
     controllers:[MerchantController],
     providers:[
         MechartService,
-        JwtStrategy,
+        TerminalJwtStrategy,
+        IssuerJwtStrategy,
+        JwtService,
         Conversion,
         AccountService,
         IssuerService,

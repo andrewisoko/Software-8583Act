@@ -2,8 +2,9 @@ import { PrimaryColumn,Column,Entity,CreateDateColumn,OneToMany } from "typeorm"
 import { Transaction } from "src/services/orchestrator/entity/transaction.entity";
 
 export enum Role {
-    CUSTOMER = "customer",
-    TERMINAL = "terminal"
+    ISSUER = "issuer",
+    TERMINAL = "terminal",
+    NULL = "null"
 }
 
 @Entity("Terminal")
@@ -35,7 +36,7 @@ export class Terminal{
     @Column({
         type:"enum",
         enum:Role,
-        default:Role.CUSTOMER
+        default:Role.NULL
     })
     role:Role
 
