@@ -44,7 +44,7 @@ export class Account{
     @UpdateDateColumn({ name: 'updated_at' })
         updatedAt: Date;
 
-    @OneToMany(() => Transaction, transaction => transaction.customer)
+    @OneToMany(() => Transaction, transaction => transaction.account)
         transactions: Transaction[];
 
     @OneToMany(() => Ledger, ledger => ledger.account)

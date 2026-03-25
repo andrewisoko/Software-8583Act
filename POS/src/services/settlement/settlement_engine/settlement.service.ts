@@ -25,28 +25,36 @@ export class SettlementService {
 
     async updates(id:string){
 
+      const transaction = await this.transactionRepository.findOne({where:{id:id}});
+      if (!transaction) throw new Error ("Transaction not found");
+
       const transactionStatus = await this.findTransactStatus(id);
-      if (transactionStatus !== TRANSACTION_STATUS.APPROVED) throw new Error("Transaction not approved.");
+      if (transactionStatus !== TRANSACTION_STATUS.APPROVED) throw new Error("Transaction at settlement level not approved.");
 
       const account = await this.accountRepository.findOne({
         where:{
           transactions:{
             id:id
-          }}});
-      if (!account) throw new Error ("Transaction not found");
+            }
+          },
+          relations:["transactions"]
+        });
+      if (!account) throw new Error ("Account at settlement level not found");
 
-      const newLedgerBalance = account.ledger_balance = account.available_balance;
-      const resettledHold = account.hold = 0;
-    
 
-      await this.accountRepository.manager.transaction( async manager =>{
-      manager.save([newLedgerBalance,resettledHold,]);
+     
 
-      console.log("ledger balance", account.ledger_balance);
-      console.log("hold", account.hold);
+      await this.accountRepository.decrement({id:account.id},'ledger_balance',account.hold);
+      await this.accountRepository.decrement({id:account.id},'hold',account.hold);
 
-        return "Account updated";
-      })
+      transaction.status = TRANSACTION_STATUS.SETTLED
+      await this.transactionRepository.save(transaction)
+
+         console.log ({
+            message: "Account updated",
+            transaction_status: transaction.status
+        } );
+      }
    
     }
-}
+

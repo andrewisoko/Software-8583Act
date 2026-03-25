@@ -17,8 +17,8 @@ export class SettlementController {
     @Roles(Role.TERMINAL)
     @Post('engine-updates')
     updates(
-        @Body() id:string
+        @Body() Dto:{id:string}
     ){
-        return this.settlementEngineServices.updates(id)
+        return this.settlementEngineServices.updates(Dto.id)
     }
 }

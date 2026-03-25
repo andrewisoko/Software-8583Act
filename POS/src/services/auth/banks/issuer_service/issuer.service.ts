@@ -110,7 +110,7 @@ export class IssuerService {
                 stan:stan,
                 role:Role.ISSUER
             })
-            
+        
             
             /*Authorisation process */
 
@@ -135,7 +135,7 @@ export class IssuerService {
             const isApproved = accountChecks.data?.action === 'approved';
             
             if (!isApproved) {
-                console.log("transaction not approved")
+                console.log("transaction at issuer not approved")
                 return;
             }
             const eventTimeStamp = new Date(Date.now())

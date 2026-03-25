@@ -5,6 +5,8 @@ import { JwtAuthGuard } from '../auth/authGuard';
 import { Roles } from '../auth/roles/roles.decorators';
 import { RolesGuard } from '../auth/roles/roles.guard';
 import { Role } from '../web_terminal/entity/wt.entity';
+import { AuthGuard } from '@nestjs/passport';
+
 
 @Controller('ledger')
 export class LedgerController {
@@ -12,7 +14,7 @@ export class LedgerController {
         private readonly ledgerService: LedgerService
     ){}
 
-    @UseGuards(JwtAuthGuard,RolesGuard)
+    @UseGuards(AuthGuard('issuer-jwt'),RolesGuard)
     @Roles(Role.ISSUER)
     @Post("double-entry")
     async saveDoubleEntry(

@@ -13,15 +13,27 @@ import { Terminal } from "../web_terminal/entity/wt.entity";
 import { RuleEngine } from "../rule_engine_service/entity/rule.engine.entity";
 import { IssuerService } from "../auth/banks/issuer_service/issuer.service";
 import { Conversion } from "../auth/banks/iso_val_conversions/conversions";
-import { PartyBankAccount } from "../auth/banks/partyBankAccount";
 import { ConfigService } from "@nestjs/config";
 import { AccountService } from "../account_service/account.service";
 import { Ledger } from "../ledger.service/entity/ledger.entity";
+import { JwtModule } from "@nestjs/jwt";
+import { ConfigModule } from "@nestjs/config";
 
 
 @Module({
     imports:[
         HttpModule,
+        JwtModule.registerAsync({
+                imports:[ConfigModule],
+                inject:[ConfigService],
+                useFactory:(configService:ConfigService) => {
+                    
+                    return{
+                        global: true,
+                        secret: configService.get<string>("JWT_KEY"),
+                    }
+                },
+            }),
         TypeOrmModule.forFeature([
             Transaction,
             Party,
@@ -41,7 +53,6 @@ import { Ledger } from "../ledger.service/entity/ledger.entity";
         IssuerService,
         EncryptSecurity,
         Conversion,
-        PartyBankAccount,
         AccountService,
         ConfigService
         

@@ -5,6 +5,7 @@ import { Role } from '../web_terminal/entity/wt.entity';
 import { JwtAuthGuard } from '../auth/authGuard';
 import { RolesGuard } from '../auth/roles/roles.guard';
 import { Roles } from '../auth/roles/roles.decorators';
+import { AuthGuard } from '@nestjs/passport';
 
 
 @Controller('account')
@@ -14,7 +15,7 @@ export class AccountController {
         private readonly accountService:AccountService,
     ){}
 
-    @UseGuards(JwtAuthGuard,RolesGuard)
+    @UseGuards(AuthGuard('issuer-jwt'),RolesGuard)
     @Roles(Role.ISSUER)
     @Post("account-checks")
     async accountChecks(

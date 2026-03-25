@@ -124,9 +124,6 @@ export class TransactionService{
         try {
             
             /* data from gateway-api to transaction service first hop*/
-
-            // const account =  await this.accountRepository.findOne({ where: {panEncrypt: '{"iv":"4f2619f4d6ffa083b5e582b9","content":"e64d7b0186b5d34ae8f9a5797bf3be03","tag":"25bbf1cafe417e3c81707fa25fa1ed54"}' }})
-            // console.log("account ", account)
     
             const transaction = await this.createTransaction({
                 pan:fullRequestData.pan,
@@ -241,12 +238,15 @@ export class TransactionService{
             )
             const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
             
+     
             const issuerService = this.issuerService.IssuerBankService();
-            await sleep(3000);  /*waits for response */
+            await sleep(4000);  /*waits for response */
 
 
         /* publishing event on kafka, notification service, ledger service settlement service react to it */
 
+
+        
         const settlementEngine = await firstValueFrom(
             this.httpService.post(
                 'http://localhost:3002/api.gateway/settlement/engine-updates',
@@ -259,7 +259,6 @@ export class TransactionService{
 
             )
         )
-
 
         } catch (error) {
             console.log(`Error: ${error}`)

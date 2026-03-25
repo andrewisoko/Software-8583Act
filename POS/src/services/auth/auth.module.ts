@@ -7,7 +7,6 @@ import { MechartService } from "./merchant_service/merchant.service";
 import { TerminalJwtStrategy } from "./terminal.jwt.strategy";
 import { Conversion } from "./banks/iso_val_conversions/conversions";
 import { IssuerService } from './banks/issuer_service/issuer.service';
-import { PartyBankAccount } from "./banks/partyBankAccount";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Transaction } from "../orchestrator/entity/transaction.entity";
 import { EncryptSecurity } from "../orchestrator/encryption/encrypt.security";
@@ -30,6 +29,7 @@ import { IssuerJwtStrategy } from "./banks/issuer_service/Issuer.jwt.strategy";
             imports:[ConfigModule],
             inject:[ConfigService],
             useFactory:(configService:ConfigService) => {
+                
                 return{
                     global: true,
                     secret: configService.get<string>("JWT_KEY"),
@@ -42,7 +42,6 @@ import { IssuerJwtStrategy } from "./banks/issuer_service/Issuer.jwt.strategy";
         MechartService,
         TerminalJwtStrategy,
         IssuerJwtStrategy,
-        JwtService,
         Conversion,
         AccountService,
         IssuerService,

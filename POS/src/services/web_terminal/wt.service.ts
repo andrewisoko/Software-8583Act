@@ -55,7 +55,6 @@ export class WebTerminal{
         terminalEntity.acc_token = terminal_token
         
         await this.TerminalRepository.save(terminalEntity);
-        // await this.TerminalRepository.save({ acc_token:terminal_token })
 
         return {terminal_token:terminal_token}
 
