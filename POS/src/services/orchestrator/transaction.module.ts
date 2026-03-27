@@ -18,6 +18,7 @@ import { AccountService } from "../account_service/account.service";
 import { Ledger } from "../ledger.service/entity/ledger.entity";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfigModule } from "@nestjs/config";
+import { ClientKafka } from "@nestjs/microservices";
 
 
 @Module({
@@ -54,8 +55,7 @@ import { ConfigModule } from "@nestjs/config";
         EncryptSecurity,
         Conversion,
         AccountService,
-        ConfigService
-        
+        ConfigService,  
     ],
 })
 

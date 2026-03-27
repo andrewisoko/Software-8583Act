@@ -21,6 +21,8 @@ import { Acquirer } from 'src/services/auth/banks/entity/acquirer.entity';
 import { Ledger } from 'src/services/ledger.service/entity/ledger.entity';
 import { LedgerModule } from 'src/services/ledger.service/ledger.module';
 import { SettlementEngineModule } from 'src/services/settlement/settlement_engine/settlement.module';
+import { NotificationModule } from 'src/services/notification.service/notification.module';
+import { ClientKafka } from '@nestjs/microservices';
 
 
 
@@ -44,7 +46,8 @@ import { SettlementEngineModule } from 'src/services/settlement/settlement_engin
       WTModule,
       AcquirerModule,
       LedgerModule,
-      SettlementEngineModule
+      SettlementEngineModule,
+      NotificationModule,
     ],
     inject:[ConfigService],
     useFactory:(configService:ConfigService) => {

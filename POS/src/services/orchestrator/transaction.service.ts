@@ -242,11 +242,10 @@ export class TransactionService{
             const issuerService = this.issuerService.IssuerBankService();
             await sleep(4000);  /*waits for response */
 
-
-        /* publishing event on kafka, notification service, ledger service settlement service react to it */
             
-
-         if( transaction.status === TRANSACTION_STATUS.APPROVED){
+        /* publishing event on kafka, notification service, ledger service settlement service react to it */
+      
+        //  if( transaction.status === TRANSACTION_STATUS.APPROVED){
 
          
             const notificationService = await firstValueFrom(
@@ -262,8 +261,8 @@ export class TransactionService{
                 )
             )
 
-         }
-
+        //  }
+         
         
         const settlementEngine = await firstValueFrom(
             this.httpService.post(
@@ -277,6 +276,7 @@ export class TransactionService{
 
             )
         )
+
 
         } catch (error) {
             console.log(`Error: ${error}`)

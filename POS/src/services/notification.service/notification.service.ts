@@ -1,5 +1,10 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 import { ClientKafka } from '@nestjs/microservices';
+import { AppModule } from 'src/api_gateway/config/app.module';
+import { Transport, MicroserviceOptions } from '@nestjs/microservices';
+import { Inject } from '@nestjs/common';
+import { NotificationModule } from './notification.module';
 
 export interface KafkaMessageData {
 
@@ -14,22 +19,39 @@ export interface KafkaMessageData {
 @Injectable()
 export class NotificationService implements OnModuleInit {
 
-    constructor(private readonly client: ClientKafka) {}
+       @Inject('KAFKA_SERVICE') private readonly client: ClientKafka
 
-      async onModuleInit() {
-            await this.client.connect();
-        }
+    async bootstrap() {
+      const app = await NestFactory.createMicroservice<MicroserviceOptions>(NotificationModule, {
+        transport: Transport.KAFKA,
+        options: {
+          client: {
+            clientId: 'POS-app',
+            brokers: ['localhost:9092'], 
+          },
+          consumer: {
+            groupId: 'user-account',
+          },
+        },
+      });
+    
+      await app.listen();
+    }
 
-        async sendMessage(data:KafkaMessageData) {
-            return this.client.emit('notification-topic', {
-                
-                message: data.message,
-                customer:data.customer,
-                amount:data.amount,
-                currency:data.currency,
-                merchant:data.merchant,
-                timestamp:data.timestamp,
-            });
-        }
+    async onModuleInit() {
+        await this.client.connect();
+    }
+
+    async sendMessage(data:KafkaMessageData) {
+        return this.client.emit('notification-topic', {
+
+            message: data.message,
+            customer:data.customer,
+            amount:data.amount,
+            currency:data.currency,
+            merchant:data.merchant,
+            timestamp:data.timestamp,
+        });
+    }
     
 }

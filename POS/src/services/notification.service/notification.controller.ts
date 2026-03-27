@@ -20,9 +20,10 @@ export class NotificationController {
         merchant:string,
         timestamp:string
     }
-    ){
-
+    ){ 
+        await this.notificationService.bootstrap()
         await this.notificationService.onModuleInit()
+
         return this.notificationService.sendMessage({
             message: dataDto.message,
             customer:dataDto.customer,
@@ -31,5 +32,6 @@ export class NotificationController {
             merchant:dataDto.merchant,
             timestamp:dataDto.timestamp
         })
+        
     }
 }
