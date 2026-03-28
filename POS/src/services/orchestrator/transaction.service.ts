@@ -182,7 +182,7 @@ export class TransactionService{
 
             panToken = tokenResponse.data;
             // console.log(panToken);
-
+            
            
             /* transansaction service calls rule engine. */
 
@@ -236,16 +236,21 @@ export class TransactionService{
 
                 )
             )
+            
             const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
             
      
             const issuerService = this.issuerService.IssuerBankService();
-            await sleep(4000);  /*waits for response */
+            await sleep(3000);  /*waits for response */
 
             
-        /* publishing event on kafka, notification service, ledger service settlement service react to it */
-      
-        //  if( transaction.status === TRANSACTION_STATUS.APPROVED){
+        /* publishing event on kafka*/
+
+
+        const approvedTrn = await this.transactionRepository.findOne({ where:{ id:transaction.id } });
+        if ( !approvedTrn ) throw new NotFoundException( "Transaction not found" );
+
+        if( approvedTrn.status === TRANSACTION_STATUS.APPROVED){
 
          
             const notificationService = await firstValueFrom(
@@ -257,12 +262,17 @@ export class TransactionService{
                         currency:fullRequestData.currency,
                         merchant:fullRequestData.merchant,
                         timestamp:fullRequestData.timestamp,
-                    }
+                    },
+                    {
+                        headers: {
+                        Authorization: `Bearer ${terminalToken}`,
+                        },
+                     },
+                    
                 )
             )
 
-        //  }
-         
+         }
         
         const settlementEngine = await firstValueFrom(
             this.httpService.post(

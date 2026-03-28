@@ -107,8 +107,6 @@ export class AccountService {
             return { action: 'declined', code: '14' };
         }
 
-        transaction.status = TRANSACTION_STATUS.APPROVED;
-        await this.transactionRepository.save(transaction);
         return { action: 'approved', code: '00' };
         }
  
