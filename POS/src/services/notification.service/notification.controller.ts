@@ -17,7 +17,7 @@ export class NotificationController {
     async notification(
         @Body() dataDto: {
 
-        message: string,
+        message: string
         customer:string,
         amount:number,
         currency:string,
