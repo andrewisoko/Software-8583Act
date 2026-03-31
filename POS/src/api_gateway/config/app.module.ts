@@ -54,7 +54,7 @@ import { ClientKafka } from '@nestjs/microservices';
       // console.log(configService.get<string>('DB_USER'))
       return{
         type: 'postgres',
-        host: configService.get<string>('DB_'),
+        host: configService.get<string>('DB_HOST'), 
         port: parseInt(configService.get<string>('DB_PORT') ?? '5432', 10),
         username: configService.get<string>('DB_USER'),
         password: configService.get<string>('DB_PASSWORD'),
