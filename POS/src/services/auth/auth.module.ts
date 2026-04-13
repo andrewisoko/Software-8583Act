@@ -9,19 +9,20 @@ import { IssuerService } from './banks/issuer_service/issuer.service';
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Transaction } from "../orchestrator/entity/transaction.entity";
 import { EncryptSecurity } from "../orchestrator/encryption/encrypt.security";
-import { Account } from "../account_service/entity/account.entity";
 import { HttpModule } from "@nestjs/axios";
 import { AccountService } from "../account_service/account.service";
 import { Ledger } from "../ledger.service/entity/ledger.entity";
 import { IssuerJwtStrategy } from "./banks/issuer_service/Issuer.jwt.strategy";
-
+import { AccountSchema } from "../account_service/document/account.doc";
+import { MongooseModule } from "@nestjs/mongoose";
 
 
 /* initial auth approach will be a simple jwt authorisation. The app initially verifies if web POS terminal contains the token.*/
 
 @Module({
     imports:[
-        TypeOrmModule.forFeature([Transaction,Account,Ledger]),
+        TypeOrmModule.forFeature([Transaction,Ledger]),
+        MongooseModule.forFeature([ { name :'Account', schema:AccountSchema }]),
         PassportModule,
         HttpModule,
         JwtModule.registerAsync({

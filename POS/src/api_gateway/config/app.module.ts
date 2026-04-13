@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Inject, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -12,7 +12,6 @@ import { Party } from 'src/services/party_service/entity/party.entity';
 import { Transaction } from 'src/services/orchestrator/entity/transaction.entity';
 import { RuleEngineModule } from 'src/services/rule_engine_service/rule.engine.module';
 import { AccountModule } from 'src/services/account_service/account.module';
-import { Account } from 'src/services/account_service/entity/account.entity';
 import { TokenisationModule } from 'src/services/tokenisation_service/tokenisation.module';
 import { HttpModule } from '@nestjs/axios';
 import { AcquirerModule } from 'src/services/auth/banks/acquirer_service/acquirer.module';
@@ -22,7 +21,7 @@ import { Ledger } from 'src/services/ledger.service/entity/ledger.entity';
 import { LedgerModule } from 'src/services/ledger.service/ledger.module';
 import { SettlementEngineModule } from 'src/services/settlement/settlement_engine/settlement.module';
 import { NotificationModule } from 'src/services/notification.service/notification.module';
-import { ClientKafka } from '@nestjs/microservices';
+import { MongooseModule } from '@nestjs/mongoose';
 import { cardJwtStrategy } from 'src/services/auth/card/card.jwt.strategy';
 
 
@@ -42,7 +41,7 @@ import { cardJwtStrategy } from 'src/services/auth/card/card.jwt.strategy';
       RuleEngineModule,
       TokenisationModule,
       AuthModule,
-      AccountModule,
+      // AccountModule,
       HttpModule,
       WTModule,
       AcquirerModule,
@@ -66,15 +65,23 @@ import { cardJwtStrategy } from 'src/services/auth/card/card.jwt.strategy';
           Terminal,
           Party,
           Transaction,
-          Account,
           RuleEngine,
           Acquirer,
           Ledger
         ]
       }
     }
+  }),
+  MongooseModule.forRootAsync({
+    inject: [ConfigService],
+    useFactory:(configService:ConfigService) => {
+      return {
+        uri: configService.get<string>('MONGODB_URI') 
+      }
+    }
   })
   ],
+
   controllers: [AppController],
   providers: [AppService,cardJwtStrategy],
 })

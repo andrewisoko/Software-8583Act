@@ -4,13 +4,16 @@ import { Transaction, TRANSACTION_STATUS } from "./entity/transaction.entity";
 import { Repository } from "typeorm";
 import { Party } from "../party_service/entity/party.entity";
 import { Terminal } from "../web_terminal/entity/wt.entity";
-import { Account } from "../account_service/entity/account.entity";
+import { Account } from "../account_service/document/account.doc";
 import { EncryptSecurity } from "./encryption/encrypt.security";
 import { HttpService } from "@nestjs/axios";
 import { FullRequestDto } from "src/api_gateway/config/dto/request.data.dto";
 import { firstValueFrom } from 'rxjs';
 import { RuleEngine } from "../rule_engine_service/entity/rule.engine.entity";
 import { IssuerService } from "../auth/banks/issuer_service/issuer.service";
+import { Model } from "mongoose";
+import { AccountDocument } from "../account_service/document/account.doc";
+import { InjectModel } from "@nestjs/mongoose";
 
 
 
@@ -40,7 +43,7 @@ export class TransactionService{
     constructor(
         @InjectRepository(Transaction) private readonly transactionRepository:Repository<Transaction>,
         @InjectRepository(Party) private readonly partyRepository:Repository<Party>,
-        @InjectRepository(Account) private readonly accountRepository:Repository<Account>,
+        @InjectModel('Account') private accountModel: Model<AccountDocument>,
         @InjectRepository(Terminal) private readonly terminalRepository:Repository<Terminal>,
         @InjectRepository(RuleEngine) private readonly ruleEngineRepository:Repository<RuleEngine>,
 
@@ -69,7 +72,7 @@ export class TransactionService{
             const customerData = await this.partyRepository.findOne({ where:{ id:customer }})
             if(! customerData ) throw new NotFoundException("Party not found");
        
-            const accountData = await this.accountRepository.findOne({ where:{ id:account }})
+            const accountData = await this.accountModel.findOne({ id:account })
             if( ! accountData ) throw new NotFoundException("Account not found");
 
             const terminalData = await this.terminalRepository.findOne({ where:{ id:terminal }})
@@ -84,10 +87,11 @@ export class TransactionService{
                 amount:amount,
                 merchant:merchant,
                 customer:customerData,
-                account:accountData,
+                // account:accountData,
                 terminal:terminalData,
                 panEncrypt:encryptedPan,
                 expiryEncrypt:encryptExpiryDate,
+
                 })
                 await this.transactionRepository.save(transaction)
 
@@ -224,11 +228,10 @@ export class TransactionService{
                         merchant: transaction.merchant,
                         currency: transaction.currency,
                         exiprationDate: transaction.expiryEncrypt,
-                        fullName: transaction.account.fullName,
+                        fullName: transaction.customer.fullName,
                         stan:transaction.stan
         
-                    },
-                    {
+                    },                    {
                      headers: {
                     Authorization: `Bearer ${terminalToken}`,
                     },

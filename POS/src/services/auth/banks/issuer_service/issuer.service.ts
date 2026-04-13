@@ -2,8 +2,10 @@ import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/co
 import { Conversion } from '../iso_val_conversions/conversions';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { Transaction } from 'src/services/orchestrator/entity/transaction.entity';
-import { Account } from 'src/services/account_service/entity/account.entity';
+import { AccountDocument } from 'src/services/account_service/document/account.doc';
 import { TRANSACTION_STATUS } from 'src/services/orchestrator/entity/transaction.entity';
 import { AccountService} from 'src/services/account_service/account.service';
 import { firstValueFrom } from 'rxjs';
@@ -19,7 +21,7 @@ export class IssuerService {
 
     constructor(
         @InjectRepository(Transaction) private readonly transactionRepository:Repository<Transaction>,
-        @InjectRepository(Account) private readonly accountRepository:Repository<Account>,
+        @InjectModel('Account') private readonly accountModel: Model<AccountDocument>,
         private readonly accountService: AccountService,
         private readonly convertToVal: Conversion,
         private readonly httpService: HttpService,
@@ -51,30 +53,21 @@ export class IssuerService {
 
     async placeHold(accountId: string, amount: number){
 
-            await this.accountRepository.decrement(
-                { id: accountId },
-                "available_balance",
-                amount
-            );
-            await this.accountRepository.increment(
-                { id: accountId },
-                "hold",
-                amount
+            await this.accountModel.updateOne(
+                { _id: accountId },
+                { 
+                  $inc: { available_balance: -amount, hold: amount }
+                }
             );
         };
 
     async releaseHold(accountId: string, amount: number){
 
-            await this.accountRepository.increment(
-                { id: accountId },
-                "available_balance",
-                amount
-            );
-
-            await this.accountRepository.decrement(
-                { id: accountId },
-                "hold",
-                amount
+            await this.accountModel.updateOne(
+                { _id: accountId },
+                { 
+                  $inc: { available_balance: amount, hold: -amount }
+                }
             );
             console.log("Hold released",amount)
         };

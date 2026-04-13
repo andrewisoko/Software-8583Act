@@ -8,7 +8,6 @@ import { TokenisationController } from "../tokenisation_service/tokenisation.con
 import { TransactionService } from "./transaction.service";
 import { EncryptSecurity } from "./encryption/encrypt.security";
 import { Party } from "../party_service/entity/party.entity";
-import { Account } from "../account_service/entity/account.entity";
 import { Terminal } from "../web_terminal/entity/wt.entity";
 import { RuleEngine } from "../rule_engine_service/entity/rule.engine.entity";
 import { IssuerService } from "../auth/banks/issuer_service/issuer.service";
@@ -18,7 +17,8 @@ import { AccountService } from "../account_service/account.service";
 import { Ledger } from "../ledger.service/entity/ledger.entity";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfigModule } from "@nestjs/config";
-import { ClientKafka } from "@nestjs/microservices";
+import { MongooseModule } from "@nestjs/mongoose";
+import { AccountSchema } from "../account_service/document/account.doc";
 
 
 @Module({
@@ -35,10 +35,10 @@ import { ClientKafka } from "@nestjs/microservices";
                     }
                 },
             }),
+         MongooseModule.forFeature([ { name :'Account', schema:AccountSchema }]),
         TypeOrmModule.forFeature([
             Transaction,
             Party,
-            Account,
             Terminal,
             RuleEngine,
             Ledger

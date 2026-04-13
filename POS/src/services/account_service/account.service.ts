@@ -1,11 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Account } from './entity/account.entity';
 import { Repository } from 'typeorm';
 import { Transaction } from '../orchestrator/entity/transaction.entity';
 import { TRANSACTION_STATUS } from '../orchestrator/entity/transaction.entity';
 import { NotFoundException } from '@nestjs/common';
 import { EncryptSecurity } from '../orchestrator/encryption/encrypt.security';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { AccountDocument } from './document/account.doc';
+
 
 
 
@@ -14,21 +17,22 @@ export class AccountService {
 
 
     constructor(
-        @InjectRepository(Account) private readonly accountRepository:Repository<Account>,
+        // @InjectRepository(Account) private readonly accountRepository:Repository<Account>,
+        @InjectModel('Account') private accountModel: Model<AccountDocument>,
         @InjectRepository(Transaction) private readonly transactionRepository:Repository<Transaction>,
         private readonly encryption: EncryptSecurity
     ){}
 
     async decryptPanByFullName(fullNameAcc: string) {
 
-        const account = await this.accountRepository.findOne({ where: { fullName: fullNameAcc } });
+        const account = await this.accountModel.findOne({ fullName:fullNameAcc }).exec();
         if (!account) throw new NotFoundException("account not found");
 
             const encryptedObj = JSON.parse(account.panEncrypt);
             const rawPan = this.encryption.decrypt(encryptedObj);
             
             account.panEncrypt = rawPan;
-            await this.accountRepository.save(account);
+            await account.save();
 
         return account
 
@@ -38,12 +42,12 @@ export class AccountService {
 
         await this.decryptPanByFullName(fullName);
 
-            const account = await this.accountRepository.findOne({ where: {panEncrypt: pan }});
+            const account = await this.accountModel.findOne( {panEncrypt: pan } );
             if (!account) throw new NotFoundException("account not found");
 
             const panEncrypt = JSON.stringify(this.encryption.encrypt(pan));
             account.panEncrypt = panEncrypt;
-            await this.accountRepository.save(account);
+            await account.save();
 
         return account
     };
