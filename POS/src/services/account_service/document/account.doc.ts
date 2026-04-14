@@ -9,52 +9,52 @@ export enum ACCOUNT_STATUS {
 
 @Schema({ timestamps: true })
 export class Account extends Document {
+    
+    @Prop({ type: String, default: 'Johnson Handsome' })
+        fullName: string;
+
+    @Prop({ type: String, default: 'mataDo20^jssjhehaiqhey' })
+        accountNumberEncrypt: string;
 
     @Prop({ type: String, default: 'fekwjdekdoSISISIS' })
-    panEncrypt: string;
-
-    @Prop({ type: String, default: 'Johnson Handsome' })
-    fullName: string;
-
-    @Prop({ type: Types.ObjectId, ref: 'Party', required: true })
-    customerId: Types.ObjectId;
+        panEncrypt: string;
 
     @Prop({ type: Number, precision: 15, scale: 2, default: 0 })
-    ledger_balance: number;
+        ledger_balance: number;
 
     @Prop({ type: Number, precision: 15, scale: 2, default: 0 })
-    available_balance: number;
+        available_balance: number;
 
     @Prop({ type: Number, precision: 15, scale: 2, default: 0 })
-    hold: number;
+        hold: number;
 
     @Prop({ type: String, maxlength: 3, default: 'GBP' })
-    currency: string;
+        currency: string;
 
-    @Prop({ type: String, default: '12/33' })
-    expiryEncrypt: string;
+    @Prop({ type: String, default: '99/33' })
+        expiryEncrypt: string;
 
     @Prop({
         type: String,
         enum: ACCOUNT_STATUS,
         default: ACCOUNT_STATUS.ACTIVE,
     })
-    status: ACCOUNT_STATUS;
+        status: ACCOUNT_STATUS;
 
     @Prop({ type: [Types.ObjectId], ref: 'Transaction', default: [] })
-    transactions: Types.ObjectId[];
+        transactions: Types.ObjectId[];
 
     @Prop({ type: [Types.ObjectId], ref: 'Ledger', default: [] })
-    ledgerEntries: Types.ObjectId[];
+        ledgerEntries: Types.ObjectId[];
 
     @Prop({ type: Types.ObjectId, ref: 'Party' })
-    customer: Types.ObjectId;
+        customer: Types.ObjectId;
 
     @Prop({ type: Date, default: Date.now })
-    createdAt: Date;
+        createdAt: Date;
 
     @Prop({ type: Date })
-    updatedAt: Date;
+        updatedAt: Date;
 }
 
 export type AccountDocument = HydratedDocument<Account>;

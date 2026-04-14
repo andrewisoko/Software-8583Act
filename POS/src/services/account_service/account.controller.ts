@@ -28,7 +28,6 @@ export class AccountController {
         }
     ){
         return await this.accountService.accountChecks(
-            dataDto.fullName,
             dataDto.amount,
             dataDto.transaction,
             dataDto.expiryDate,

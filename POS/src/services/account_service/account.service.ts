@@ -23,30 +23,31 @@ export class AccountService {
         private readonly encryption: EncryptSecurity
     ){}
 
-    async decryptPanByFullName(fullNameAcc: string) {
+    // async decryptPanByFullName(fullNameAcc: string) {
 
-        const account = await this.accountModel.findOne({ fullName:fullNameAcc }).exec();
-        if (!account) throw new NotFoundException("account not found");
+    //     const account = await this.accountModel.findOne({ fullName:fullNameAcc }).exec();
+    //     if (!account) throw new NotFoundException("account not found");
 
-            const encryptedObj = JSON.parse(account.panEncrypt);
-            const rawPan = this.encryption.decrypt(encryptedObj);
+    //         const encryptedObj = JSON.parse(account.panEncrypt);
+    //         const rawPan = this.encryption.decrypt(encryptedObj);
             
-            account.panEncrypt = rawPan;
-            await account.save();
+    //         account.panEncrypt = rawPan;
+    //         await account.save();
 
-        return account
+    //     return account
 
-    };
+    // };
 
-    async findAccount(pan:string,fullName:string){
+    async findAccount( pan:string ){
 
-        await this.decryptPanByFullName(fullName);
+        // await this.decryptPanByFullName(fullName);
 
             const account = await this.accountModel.findOne( {panEncrypt: pan } );
             if (!account) throw new NotFoundException("account not found");
 
             const panEncrypt = JSON.stringify(this.encryption.encrypt(pan));
             account.panEncrypt = panEncrypt;
+
             await account.save();
 
         return account
@@ -69,14 +70,13 @@ export class AccountService {
 
    
     async accountChecks(
-        fullName,
         amount,
         transaction,
         expiryDate,
         pan,
         ) {
 
-        const account = await this.findAccount(pan, fullName);
+        const account = await this.findAccount( pan );
         if (!account) throw new NotFoundException("account not found");
 
         const expObj = JSON.parse(account.expiryEncrypt);

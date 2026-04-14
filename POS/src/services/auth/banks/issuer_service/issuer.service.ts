@@ -95,7 +95,7 @@ export class IssuerService {
             const amount = this.convertToVal.reverseIsoAmount(isoMsg[4]);
             const expiryDate = this.convertToVal.reverseExpiry(isoMsg[14]);
             
-            const account =  await this.accountService.findAccount(pan,fullName);
+            const account =  await this.accountService.findAccount(pan);
             const transaction = await this.findTransaction(stan);
             
             const issuerToken = this.jwtService.sign({
@@ -112,7 +112,6 @@ export class IssuerService {
                  this.httpService.post(
                     'http://localhost:3002/api.gateway/account/account-checks',
                     {
-                        fullName:fullName,
                         amount:amount,
                         transaction:transaction,
                         expiryDate:expiryDate,
