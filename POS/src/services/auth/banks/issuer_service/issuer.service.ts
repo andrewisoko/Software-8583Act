@@ -12,6 +12,7 @@ import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from 'src/services/web_terminal/entity/wt.entity';
+import { EncryptSecurity } from 'src/services/orchestrator/encryption/encrypt.security';
 
 
 
@@ -26,6 +27,7 @@ export class IssuerService {
         private readonly convertToVal: Conversion,
         private readonly httpService: HttpService,
         private readonly jwtService:JwtService,
+        private readonly encryption: EncryptSecurity
     ){}
 
     
@@ -77,7 +79,6 @@ export class IssuerService {
 
     
         const net = require('net');
-        const fs = require('fs');
 
         const server = net.createServer((socket) => {
 
@@ -94,6 +95,8 @@ export class IssuerService {
             const stan = Number( isoMsg[11] );
             const amount = this.convertToVal.reverseIsoAmount(isoMsg[4]);
             const expiryDate = this.convertToVal.reverseExpiry(isoMsg[14]);
+            const panJson = JSON.parse(pan) 
+             const rawPan = this.encryption.decrypt(panJson)
             
             const account =  await this.accountService.findAccount(pan);
             const transaction = await this.findTransaction(stan);
@@ -103,9 +106,12 @@ export class IssuerService {
                 stan:stan,
                 role:Role.ISSUER
             })
-        
             
-            /*Authorisation process */
+            /* Assuming the issuer bank check came all correct: Customer account exists and is active, sufficient funds / available credit, PIN validation (if online PIN) */
+
+            /* contract here */
+            
+            /* Authorisation process  */
 
          
             const accountChecks = await firstValueFrom(
@@ -115,7 +121,7 @@ export class IssuerService {
                         amount:amount,
                         transaction:transaction,
                         expiryDate:expiryDate,
-                        pan:pan
+                        pan: rawPan
                     },
                     {
                         headers: {
