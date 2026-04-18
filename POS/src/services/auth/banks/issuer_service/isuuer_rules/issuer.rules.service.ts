@@ -1,14 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { IssuerService } from "../issuer.service";
-import { HttpService } from "@nestjs/axios";
+
 
 export interface ContractProps{
 
     sender: string,
     receiver: string[],
     split_agreement: string,
-    transactions?: string,
     contractStatus: string,
+    transactions?: string,
     sender_percentage?: number;
     sender_amount?: number;
     receiver_percentage?: number[];

@@ -254,55 +254,102 @@ export class IssuerService {
             
             if ( setAgreements ){
 
+                console.log('set of agreements received', setAgreements);
                 const setAgreementProps = this.contractConditions(setAgreements);
 
                     for( const contractAccount of setAgreementProps[0].accounts ){
                         
                         let count;
+                        const prevAssignedAmount = this.convertToVal.reverseIsoAmount(isoMsg[4]);
 
-                        amount = (setAgreementProps[0].percentages[count] / 100) * this.convertToVal.reverseIsoAmount(isoMsg[4]);
+                        if( setAgreementProps[0].percentages.length > 1 ){
 
-                       this.callAccountService(
-                        amount,
-                        transaction,
-                        expiryDate,
-                        rawPan,
-                        issuerToken,
-                        contractAccount
-                    )
+                            amount = ((setAgreementProps[0].percentages[count] / 100) * prevAssignedAmount);
+    
+                            console.log( 'contract amount', amount )
+                            console.log( 'current count', count )
+                            console.log( 'id account', contractAccount )
+    
+                           await this.callAccountService(
+                            amount,
+                            transaction,
+                            expiryDate,
+                            rawPan,
+                            issuerToken,
+                            contractAccount
+                            );
+    
+                            await this.callLedgerService(
+                            pan,
+                            contractAccount,
+                            transaction,
+                            amount,
+                            eventTimeStamp,
+                            issuerToken
+                            );
+    
+                            count =+ 1
+                        }else if( setAgreementProps[0].amounts.length > 1 ){
+                            
+                            const sumAmounts = setAgreementProps[0].amounts.reduce( ( acc, curr ) => acc + curr, 0 );
+                            console.log( 'sum amount', sumAmounts );
+                            
+                            if( sumAmounts !==  prevAssignedAmount ) throw new Error( 'Invalid amount split [issuer service] ');
+                            amount = setAgreementProps[0].amounts[count];
 
-                    this.callLedgerService(
-                        pan,
-                        contractAccount,
-                        transaction,
-                        amount,
-                        eventTimeStamp,
-                        issuerToken
-                        )
-
-                        count =+ 1
+                            console.log( 'contract amount', amount )
+                            console.log( 'current count', count )
+                            console.log( 'id account', contractAccount )
+    
+                           await this.callAccountService(
+                            amount,
+                            transaction,
+                            expiryDate,
+                            rawPan,
+                            issuerToken,
+                            contractAccount
+                            );
+    
+                            await this.callLedgerService(
+                            pan,
+                            contractAccount,
+                            transaction,
+                            amount,
+                            eventTimeStamp,
+                            issuerToken
+                            );
+    
+                            count =+ 1
+    
+                        }
                     }
 
+            }else{
+                
+                /* Authorisation process  */
+        
+                await this.callAccountService(
+                    amount,
+                    transaction,
+                    expiryDate,
+                    rawPan,
+                    issuerToken,
+                    account
+                );
+        
+                
+                /*call on ledger service once transaction is authorised */
+        
+                await this.callLedgerService(
+                    pan,
+                    account,
+                    transaction,
+                    amount,
+                    eventTimeStamp,
+                    issuerToken
+                );
 
             }
-
-        /* Authorisation process  */
-
-            await this.callAccountService(
-                amount,
-                transaction,
-                expiryDate,
-                rawPan,
-                issuerToken,
-                account
-            )
-
-
-        
-        /*call on ledger service once transaction is authorised */
-
-   
-        
         
         });
         server.listen(5000, () => {
