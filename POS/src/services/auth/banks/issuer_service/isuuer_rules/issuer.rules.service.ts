@@ -8,7 +8,7 @@ export interface ContractProps{
     receiver: string[],
     split_agreement: string,
     contractStatus: string,
-    transactions?: string,
+    time_agreement:Date[]
     sender_percentage?: number;
     sender_amount?: number;
     receiver_percentage?: number[];
@@ -16,7 +16,6 @@ export interface ContractProps{
     repayment_agreement?:string,
     event_agreement?:string,
     location_agreement?:string,
-    time_agreement?:string
 
 } 
 

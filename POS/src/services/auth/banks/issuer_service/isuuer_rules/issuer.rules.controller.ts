@@ -10,7 +10,7 @@ interface IssuerRulesInput {
     receiver: string[],
     split_agreement: string,
     contractStatus: string,
-    transactions?: string,
+    time_agreement:Date[]
     sender_percentage?: number;
     sender_amount?: number;
     receiver_percentage?: number[];
@@ -18,7 +18,6 @@ interface IssuerRulesInput {
     repayment_agreement?:string,
     event_agreement?:string,
     location_agreement?:string,
-    time_agreement?:string
 }
 
 interface GraphQLRequest {
@@ -35,9 +34,15 @@ export class IssuerRulesController {
   constructor ( private readonly issuerRulesService: IssuerRuleService){}
   @Post('graphql')
    async handleGraphQL( @Body() body: GraphQLRequest ) {
-    const input = body.variables.input;
 
-    return this.issuerRulesService.contractData( input as ContractProps );
+    const input = body.variables.input;
+    const expiryTime = input.time_agreement[input.time_agreement.length -1];
+    if ( new Date(Date.now()) > new Date(expiryTime) ) throw new Error ('Contract expired.');
+
+
+    this.issuerRulesService.contractData( input as ContractProps );
+    console.log( 'contract received' );
+    return 'contract received';
   }
 
 }
