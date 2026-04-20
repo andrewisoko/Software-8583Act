@@ -14,7 +14,7 @@ export enum TRANSACTION_STATUS {
     REFUNDED = "refunded"
 }
 
-@Entity("Transaction")
+@Entity("transaction")
 export class Transaction {
 
 

@@ -3,7 +3,7 @@ import { PrimaryGeneratedColumn,Column,Entity,CreateDateColumn,OneToMany,JoinCol
 
 
 
-@Entity("Acquirer")
+@Entity("acquirer")
 export class Acquirer{
 
    @PrimaryGeneratedColumn('uuid')

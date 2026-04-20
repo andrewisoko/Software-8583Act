@@ -4,7 +4,7 @@ import { EncryptSecurity } from 'src/services/orchestrator/encryption/encrypt.se
 import { Conversion } from '../iso_val_conversions/conversions';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Acquirer } from '../entity/acquirer.entity';
-import { TokenisationService, vault } from 'src/services/tokenisation_service/tokenisation.service';
+import { TokenisationService } from 'src/services/tokenisation_service/tokenisation.service';
 import { Repository } from 'typeorm';
 
 @Injectable()

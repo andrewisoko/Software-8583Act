@@ -19,7 +19,7 @@ export enum STATUS{
     PENDING = 'Pending',
 }
 
-@Entity("Party")
+@Entity("party")
 export class Party {
 
     @PrimaryColumn({type:'text'})
