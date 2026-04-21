@@ -20,11 +20,13 @@ export interface ContractProps{
 
 } 
 
+
 export type { SetAgreements } from "../interfaces/set-agreements.interface";
+export const conditions: SetAgreements[] = []; // this is where the most important payload variables from the graphQL api get stored.
 
 @Injectable()
 export class IssuerRuleService{
-    constructor(private readonly issuerService: IssuerService) {}
+    // constructor(private readonly issuerService: IssuerService) {}
 
 
     contractData( contractProps: ContractProps ){
@@ -43,6 +45,7 @@ export class IssuerRuleService{
             amounts =  [contractProps.sender_amount,...contractProps.receiver_amount]
         }
         
+      
         const setAgreements:SetAgreements = {
 
             split_agreement: contractProps.split_agreement,
@@ -51,10 +54,16 @@ export class IssuerRuleService{
             amounts: amounts,
             }
 
-        return this.issuerService.IssuerBankService( setAgreements )
+        conditions.push(setAgreements)
+        
+        if ( conditions[0].split_agreement === 'percentage' || conditions[0].split_agreement === 'amount' ){
+            console.log("contract received");
+        }else{
+            throw new Error (' contract improperly filled ');
+        }
 
-        } catch (error) {
-        console.log('Error issuer rules service at', error)
-        };
+    } catch (error) {
+    console.log('Error issuer rules service at', error);
+    };
     };
 };

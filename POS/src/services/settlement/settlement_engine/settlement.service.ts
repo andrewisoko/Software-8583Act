@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Model } from 'mongoose';
-import { Account, AccountDocument } from 'src/services/account_service/document/account.doc';
+import { AccountDocument } from 'src/services/account_service/document/account.doc';
 import { Ledger } from 'src/services/ledger.service/entity/ledger.entity';
 import { Transaction, TRANSACTION_STATUS } from 'src/services/orchestrator/entity/transaction.entity';
 import { Repository } from 'typeorm';

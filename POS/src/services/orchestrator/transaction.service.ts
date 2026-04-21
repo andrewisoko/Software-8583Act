@@ -140,6 +140,7 @@ export class TransactionService{
             /* data from gateway-api to transaction service first hop*/
     
             const transaction = await this.createTransaction({
+                
                 pan:fullRequestData.pan,
                 expiry:fullRequestData.expiry,
                 amount:fullRequestData.amount,

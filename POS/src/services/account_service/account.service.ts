@@ -24,20 +24,7 @@ export class AccountService {
         private readonly encryption: EncryptSecurity
     ){}
 
-    // async decryptPanByFullName(fullNameAcc: string) {
 
-    //     const account = await this.accountModel.findOne({ fullName:fullNameAcc }).exec();
-    //     if (!account) throw new NotFoundException("account not found");
-
-    //         const encryptedObj = JSON.parse(account.panEncrypt);
-    //         const rawPan = this.encryption.decrypt(encryptedObj);
-            
-    //         account.panEncrypt = rawPan;
-    //         await account.save();
-
-    //     return account
-
-    // };
 
     async findAccount( pan:string ){
 
