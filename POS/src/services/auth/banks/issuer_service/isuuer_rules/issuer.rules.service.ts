@@ -40,8 +40,10 @@ export class IssuerRuleService{
 
         if ( contractProps.sender_percentage && contractProps.receiver_percentage ){
             percentages = [contractProps.sender_percentage,...contractProps.receiver_percentage]
+            amounts = []
         }
         if ( contractProps.sender_amount && contractProps.receiver_amount ){
+            percentages = []
             amounts =  [contractProps.sender_amount,...contractProps.receiver_amount]
         }
         

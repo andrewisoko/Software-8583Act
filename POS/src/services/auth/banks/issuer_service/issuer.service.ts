@@ -299,7 +299,8 @@ export class IssuerService implements OnModuleInit {
 
                     // console.log('set of agreements', conditions[0] );
                     const setAgreements = conditions[0];
-
+                    
+                    console.log(setAgreements)
 
                         for( const contractAccountId of setAgreements.accounts ){
                             
@@ -350,13 +351,13 @@ export class IssuerService implements OnModuleInit {
                                 count =+ 1;
 
 
-                            }else if( conditions[0].amounts.length > 1 ){
+                            }else if( setAgreements.amounts.length > 1 ){
                                 
-                                const sumAmounts = conditions[0].amounts.reduce( ( acc, curr ) => acc + curr, 0 );
+                                const sumAmounts = setAgreements.amounts.reduce( ( acc, curr ) => acc + curr, 0 );
                                 console.log( 'sum amount', sumAmounts );
                                 
                                 if( sumAmounts !==  wholeAmount ) throw new Error( 'Invalid amount split [issuer service] ');
-                                splitAmount = conditions[0].amounts[count];
+                                splitAmount = setAgreements.amounts[count];
 
                                 console.log( 'contract amount', splitAmount );
 
