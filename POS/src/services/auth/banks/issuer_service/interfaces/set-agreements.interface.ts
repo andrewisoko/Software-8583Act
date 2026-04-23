@@ -4,5 +4,6 @@ export interface SetAgreements {
     accounts: string[], 
     percentages: number[], 
     amounts: number[],
+    expiryTime:Date
     
     }

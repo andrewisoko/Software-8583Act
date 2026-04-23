@@ -37,8 +37,8 @@ export class IssuerRulesController {
 
     const input = body.variables.input;
     const expiryTime = input.time_agreement[input.time_agreement.length -1];
-    if ( new Date(Date.now()) > new Date(expiryTime) ) throw new Error ('Contract expired.');
-
+    
+    if ( new Date(Date.now()) > new Date(expiryTime) ) throw new Error ('contract expired.');
 
     this.issuerRulesService.contractData( input as ContractProps );
     return 'contract received';

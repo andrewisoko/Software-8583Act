@@ -10,6 +10,7 @@ export class AppService {
   ){}
   
   async redirectTransaction(body: FullRequestDto) {
+  
   const response = await firstValueFrom(
     this.httpService.post(
       'http://localhost:3002/api.gateway/transaction/orchestra',

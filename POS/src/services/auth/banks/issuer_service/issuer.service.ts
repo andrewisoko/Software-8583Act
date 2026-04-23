@@ -66,7 +66,7 @@ export class IssuerService implements OnModuleInit {
 
     async placeHold(accountId: string, amount: number){
 
-            console.log('account id placeHold', accountId )
+
             await this.accountModel.updateOne(
                 { _id: accountId },
                 { 
@@ -249,7 +249,7 @@ export class IssuerService implements OnModuleInit {
     /*------------------------------*/
 
 
-    IssuerBankService(  ){
+    IssuerBankService(){
 
 
         this.server.once('connection', (socket) => {
@@ -283,25 +283,23 @@ export class IssuerService implements OnModuleInit {
                     role:Role.ISSUER
                 })
                 
-            
                 
                 /* Assuming the issuer bank check came all correct: Customer account exists and is active, sufficient funds / available credit, PIN validation (if online PIN) */
     
                 /* contract here */
 
-               
+                
 
+            try {
                 if ( conditions.length > 0 ){
+
 
                     let count = 0;
                     let splitAmount = 0;
                     let contractTransaction;
-
-                    // console.log('set of agreements', conditions[0] );
                     const setAgreements = conditions[0];
-                    
-                    console.log(setAgreements)
 
+            
                         for( const contractAccountId of setAgreements.accounts ){
                             
                             const prevTransaction = await this.findTransaction(stan);
@@ -309,6 +307,11 @@ export class IssuerService implements OnModuleInit {
 
                             if( setAgreements.percentages.length > 1 ){
                            
+                                if (new Date(Date.now()) > new Date(conditions[0].expiryTime) ){
+                                    conditions.pop()
+                                    throw new Error ('contract percentage expired ');
+                                };
+
                                 const splitAmount = (( setAgreements.percentages[count] / 100) * wholeAmount );
                                 prevTransaction.amount = splitAmount;
 
@@ -353,13 +356,16 @@ export class IssuerService implements OnModuleInit {
 
                             }else if( setAgreements.amounts.length > 1 ){
                                 
+                                if (new Date(Date.now()) > new Date(conditions[0].expiryTime) ){ 
+                                    conditions.pop()
+                                    throw new Error ('contract amount expired');
+                                };
                                 const sumAmounts = setAgreements.amounts.reduce( ( acc, curr ) => acc + curr, 0 );
-                                console.log( 'sum amount', sumAmounts );
+                            
                                 
                                 if( sumAmounts !==  wholeAmount ) throw new Error( 'Invalid amount split [issuer service] ');
                                 splitAmount = setAgreements.amounts[count];
 
-                                console.log( 'contract amount', splitAmount );
 
                                 contractTransaction = count < 1 ? prevTransaction 
                                 : await this.createTransactionContract(
@@ -404,7 +410,7 @@ export class IssuerService implements OnModuleInit {
                             }
                         }
 
-                }else{
+                    }else{
                     
                     /* Authorisation process  */
             
@@ -432,6 +438,13 @@ export class IssuerService implements OnModuleInit {
                     );
 
                 }
+                
+
+               } catch (error) {
+                    console.log('Error occurred at', error )
+               }
+
+             
             
             });
 

@@ -13,6 +13,7 @@ import { IssuerService } from "../auth/banks/issuer_service/issuer.service";
 import { Model } from "mongoose";
 import { AccountDocument } from "../account_service/document/account.doc";
 import { InjectModel } from "@nestjs/mongoose";
+import { conditions } from "../auth/banks/issuer_service/isuuer_rules/issuer.rules.service";
 
 
 
@@ -256,53 +257,62 @@ export class TransactionService{
      
             const issuerService = this.issuerService.IssuerBankService();
 
-            /* poll until issuer updates the transaction status */
+           
             let approvedTrn: Transaction | null = null;
-            for (let i = 0; i < 20; i++) {
-                await sleep(500);
-                approvedTrn = await this.transactionRepository.findOne({ where:{ id:transaction.id } });
-                if (approvedTrn && approvedTrn.status !== TRANSACTION_STATUS.PENDING) break;
+
+            if (conditions.length > 0 && new Date(Date.now()) > new Date(conditions[0].expiryTime) ){
+            
+                transaction.status = TRANSACTION_STATUS.DECLINED;
+                throw new Error("transaction declined");// wrote this to handle expired contract following with new contract sent on, at the same time setting transaction status to fail and avoid going throw unnecessary additional processes.
+                
+
+             }else{
+
+                 for (let i = 0; i < 20; i++) {
+                     await sleep(500);
+                     approvedTrn = await this.transactionRepository.findOne({ where:{ id:transaction.id } });
+                     if (approvedTrn && approvedTrn.status !== TRANSACTION_STATUS.PENDING) break;
+                 }
+                 if ( !approvedTrn ) throw new NotFoundException( "Transaction not found" );
+                 console.log("transaction status after issuer:", approvedTrn.status);
+
+                if( approvedTrn.status === TRANSACTION_STATUS.APPROVED){
+        
+                
+                    const notificationService = await firstValueFrom(
+                        this.httpService.post('http://localhost:3002/api.gateway/notification/kafka-message',
+                            {
+                                message: "Transaction details",
+                                customer:fullRequestData.customer,
+                                amount:fullRequestData.amount,
+                                currency:fullRequestData.currency,
+                                merchant:fullRequestData.merchant,
+                                timestamp:fullRequestData.timestamp,
+                            },
+                            {
+                                headers: {
+                                Authorization: `Bearer ${terminalToken}`,
+                                },
+                            },
+                            
+                        )
+                    )
+        
+                    const settlementEngine = await firstValueFrom(
+                        this.httpService.post(
+                            'http://localhost:3002/api.gateway/settlement/engine-updates',
+                            {id:transaction.id},
+                                {
+                                headers: {
+                                Authorization: `Bearer ${terminalToken}`,
+                                },
+                            },
+        
+                        )
+                    )
+        
+                }
             }
-            if ( !approvedTrn ) throw new NotFoundException( "Transaction not found" );
-            console.log("Transaction status after issuer:", approvedTrn.status);
-
-        if( approvedTrn.status === TRANSACTION_STATUS.APPROVED){
-
-         
-            const notificationService = await firstValueFrom(
-                this.httpService.post('http://localhost:3002/api.gateway/notification/kafka-message',
-                    {
-                        message: "Transaction details",
-                        customer:fullRequestData.customer,
-                        amount:fullRequestData.amount,
-                        currency:fullRequestData.currency,
-                        merchant:fullRequestData.merchant,
-                        timestamp:fullRequestData.timestamp,
-                    },
-                    {
-                        headers: {
-                        Authorization: `Bearer ${terminalToken}`,
-                        },
-                     },
-                    
-                )
-            )
-
-            const settlementEngine = await firstValueFrom(
-                this.httpService.post(
-                    'http://localhost:3002/api.gateway/settlement/engine-updates',
-                    {id:transaction.id},
-                        {
-                         headers: {
-                        Authorization: `Bearer ${terminalToken}`,
-                        },
-                     },
-
-                )
-            )
-
-         }
-
 
         } catch (error) {
             console.log(`Error: ${error}`)

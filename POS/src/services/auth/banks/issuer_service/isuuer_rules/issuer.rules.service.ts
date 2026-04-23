@@ -54,6 +54,7 @@ export class IssuerRuleService{
             accounts: accounts, 
             percentages: percentages, 
             amounts: amounts,
+            expiryTime:contractProps.time_agreement[1]
             }
 
         conditions.push(setAgreements)
