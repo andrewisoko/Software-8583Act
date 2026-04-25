@@ -12,7 +12,7 @@ import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from 'src/services/web_terminal/entity/wt.entity';
-import { conditions } from './isuuer_rules/issuer.rules.service';
+import { conditions } from './issuer_rules/issuer.rules.service';
 import { EncryptSecurity } from 'src/services/orchestrator/encryption/encrypt.security';
 import { SettlementService } from 'src/services/settlement/settlement_engine/settlement.service';
 

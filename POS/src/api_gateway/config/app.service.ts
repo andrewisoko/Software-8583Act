@@ -2,11 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { FullRequestDto } from './dto/request.data.dto';
 import { firstValueFrom } from 'rxjs';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AppService {
   constructor(
     private readonly httpService: HttpService,
+    private readonly jwtService: JwtService,
   ){}
   
   async redirectTransaction(body: FullRequestDto) {

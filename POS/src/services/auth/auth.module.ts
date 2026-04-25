@@ -16,8 +16,8 @@ import { IssuerJwtStrategy } from "./banks/issuer_service/Issuer.jwt.strategy";
 import { ContractJwtStrategy } from "./banks/issuer_service/contract.jwt.strategy";
 import { AccountSchema } from "../account_service/document/account.doc";
 import { MongooseModule } from "@nestjs/mongoose";
-import { IssuerRuleService } from "./banks/issuer_service/isuuer_rules/issuer.rules.service";
-import { IssuerRulesController } from "./banks/issuer_service/isuuer_rules/issuer.rules.controller";
+import { IssuerRuleService } from "./banks/issuer_service/issuer_rules/issuer.rules.service";
+import { IssuerRulesController } from "./banks/issuer_service/issuer_rules/issuer.rules.controller";
 import { SettlementService } from "../settlement/settlement_engine/settlement.service";
 
 

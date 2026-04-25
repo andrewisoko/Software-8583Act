@@ -13,7 +13,7 @@ import { IssuerService } from "../auth/banks/issuer_service/issuer.service";
 import { Model } from "mongoose";
 import { AccountDocument } from "../account_service/document/account.doc";
 import { InjectModel } from "@nestjs/mongoose";
-import { conditions } from "../auth/banks/issuer_service/isuuer_rules/issuer.rules.service";
+import { conditions } from "../auth/banks/issuer_service/issuer_rules/issuer.rules.service";
 
 
 
@@ -53,6 +53,13 @@ export class TransactionService{
         private readonly issuerService:IssuerService
 
     ){}
+
+    /*----------------------------*/
+    /*----------------------------*/
+    /*------SET UPFUNCTIONS-------*/
+    /*----------------------------*/
+    /*----------------------------*/
+
 
     async createTransaction({
         pan,
@@ -128,9 +135,15 @@ export class TransactionService{
    createStan(){
         const randomNum = Math.floor(Math.random() * 1000000);
         return randomNum
-    }
+    };
 
     
+    /*------------------------------*/
+    /*------------------------------*/
+    /*--------MAIN FUNCTION---------*/
+    /*------------------------------*/
+    /*------------------------------*/
+
 
     async orchestrate( /* transaction service via httpService orchestrates its operations */
     fullRequestData:FullRequestDto,

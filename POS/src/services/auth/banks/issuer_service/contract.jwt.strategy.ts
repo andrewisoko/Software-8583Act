@@ -15,7 +15,7 @@ export class ContractJwtStrategy extends PassportStrategy(Strategy, 'contract-jw
   }
 
   async validate(certPayload: any) {
-    if (certPayload.role !== Role.CONTRACT) throw new UnauthorizedException('Invalid contract token');
+    if ( certPayload.role !== Role.CONTRACT ) throw new UnauthorizedException('Invalid contract token');
 
     return {
       account: certPayload.account,
