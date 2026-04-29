@@ -8,15 +8,15 @@ import { JwtService } from '@nestjs/jwt';
 export class AppService {
   constructor(
     private readonly httpService: HttpService,
-    private readonly jwtService: JwtService,
   ){}
   
-  async redirectTransaction(body: FullRequestDto) {
-  
-  const response = await firstValueFrom(
-    this.httpService.post(
-      'http://localhost:3002/api.gateway/transaction/orchestra',
-      body
+  async redirectTransaction(body:FullRequestDto) {
+
+    const response = await firstValueFrom(
+      this.httpService.post(
+        'http://localhost:3002/api.gateway/transaction/orchestra',
+        body,
+        {}
     )
   );
 
