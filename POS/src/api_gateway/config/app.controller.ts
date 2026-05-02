@@ -9,7 +9,7 @@ import { AuthGuard } from '@nestjs/passport';
 export class AppController {
   constructor( private readonly appService:AppService ){}
 
-  @UseGuards(AuthGuard('card-jwt'))
+  // @UseGuards(AuthGuard('card-jwt'))
   @Post()
   RedirectTransactionController(
     @Body() dataDto:FullRequestDto

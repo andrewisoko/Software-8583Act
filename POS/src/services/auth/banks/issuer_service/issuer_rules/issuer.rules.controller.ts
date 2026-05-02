@@ -1,6 +1,10 @@
 import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
 import { ContractProps, IssuerRuleService } from './issuer.rules.service';
 import { AuthGuard } from '@nestjs/passport';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Transaction } from 'src/services/orchestrator/entity/transaction.entity';
+import { Repository } from 'typeorm';
+
 
 
 
@@ -32,7 +36,9 @@ interface GraphQLRequest {
 @Controller('issuer-rules')
 export class IssuerRulesController {
 
-  constructor ( private readonly issuerRulesService: IssuerRuleService){}
+  constructor ( 
+    @InjectRepository(Transaction) private readonly transactionRepository:Repository<Transaction>,
+    private readonly issuerRulesService: IssuerRuleService){}
 
   @UseGuards(AuthGuard('contract-jwt'))
   @Post('graphql')
@@ -40,9 +46,12 @@ export class IssuerRulesController {
 
     const input = body.variables.input;
     const expiryTime = input.time_agreement[input.time_agreement.length -1];
+    console.log(input)
 
-
-    if ( new Date(Date.now()) > new Date(expiryTime) ) throw new Error ('contract expired.');
+    if ( new Date(Date.now()) > new Date(expiryTime) ){
+      throw new Error ('contract expired.');
+    } 
+      
 
     this.issuerRulesService.contractData( input as ContractProps );
     return 'contract received';

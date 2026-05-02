@@ -7,11 +7,6 @@ import { Model, Types } from 'mongoose';
 import { Role } from 'src/services/web_terminal/entity/wt.entity';
 import { AccountDocument } from 'src/services/account_service/document/account.doc';
 
-interface ContractJwtPayload {
-  role: Role;
-  account: string;
-}
-
 @Injectable()
 export class ContractJwtStrategy extends PassportStrategy(Strategy, 'contract-jwt') {
   constructor(
@@ -25,22 +20,17 @@ export class ContractJwtStrategy extends PassportStrategy(Strategy, 'contract-jw
     });
   }
 
-  async validate(certPayload: ContractJwtPayload) {
+  async validate(certPayload: any) {
     if (certPayload.role !== Role.CONTRACT) {
       throw new UnauthorizedException('Invalid contract token');
     }
 
-    if (typeof certPayload.account !== 'string' || !certPayload.account.trim()) {
-      throw new UnauthorizedException('Invalid account in token');
-    }
-    const accountId = certPayload.account.trim();
-
-    if (!Types.ObjectId.isValid(accountId)) {
+    if (!certPayload.account || !Types.ObjectId.isValid(certPayload.account)) {
       throw new UnauthorizedException('Invalid account in token');
     }
 
     const account = await this.accountModel
-      .findById(accountId)
+      .findById(certPayload.account)
       .select({ _id: 1 })
       .lean();
 

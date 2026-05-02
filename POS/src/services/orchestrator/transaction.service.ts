@@ -13,8 +13,14 @@ import { IssuerService } from "../auth/banks/issuer_service/issuer.service";
 import { Model } from "mongoose";
 import { AccountDocument } from "../account_service/document/account.doc";
 import { InjectModel } from "@nestjs/mongoose";
-import { conditions } from "../auth/banks/issuer_service/issuer_rules/issuer.rules.service";
 
+
+
+//--------------//
+//--------------//
+//--interfaces--//
+//--------------//
+//--------------//
 
 
 export interface EngineCheckRequest {
@@ -273,41 +279,36 @@ export class TransactionService{
            
             let approvedTrn: Transaction | null = null;
 
-            if (conditions.length > 0 && new Date(Date.now()) > new Date(conditions[0].expiryTime) ){
-                transaction.status = TRANSACTION_STATUS.DECLINED;
+            for (let i = 0; i < 20; i++) {
+                await sleep(500);
+                approvedTrn = await this.transactionRepository.findOne({ where:{ id:transaction.id } });
+                if (approvedTrn && approvedTrn.status !== TRANSACTION_STATUS.PENDING) break;
+            }
+            if ( !approvedTrn ) throw new NotFoundException( "Transaction not found" );
+            console.log("transaction status after issuer:", approvedTrn.status);
 
-                  const notificationService = await firstValueFrom(
-                        this.httpService.post('http://localhost:3002/api.gateway/notification/kafka-message',
-                            {
-                                message: "transaction declined",
-                                customer:fullRequestData.customer,
-                                amount:fullRequestData.amount,
-                                currency:fullRequestData.currency,
-                                merchant:fullRequestData.merchant,
-                                timestamp:fullRequestData.timestamp,
+            if (approvedTrn.status === TRANSACTION_STATUS.DECLINED ){
+                const notificationService = await firstValueFrom(
+                    this.httpService.post('http://localhost:3002/api.gateway/notification/kafka-message',
+                        {
+                            message: "transaction declined",
+                            customer:fullRequestData.customer,
+                            amount:fullRequestData.amount,
+                            currency:fullRequestData.currency,
+                            merchant:fullRequestData.merchant,
+                            timestamp:fullRequestData.timestamp,
+                        },
+                        {
+                            headers: {
+                            Authorization: `Bearer ${terminalToken}`,
                             },
-                            {
-                                headers: {
-                                Authorization: `Bearer ${terminalToken}`,
-                                },
-                            },
-                            
-                        )
-                    );
-                throw new Error("check expiry date of contract provided");// wrote this to handle expired contract following with new contract sent on, at the same time setting transaction status to fail and avoid going throw unnecessary additional processes.
-                
+                        },
+                        
+                    )
+                );
+                throw new Error();
 
-             }else{
-
-                 for (let i = 0; i < 20; i++) {
-                     await sleep(500);
-                     approvedTrn = await this.transactionRepository.findOne({ where:{ id:transaction.id } });
-                     if (approvedTrn && approvedTrn.status !== TRANSACTION_STATUS.PENDING) break;
-                 }
-                 if ( !approvedTrn ) throw new NotFoundException( "Transaction not found" );
-                 console.log("transaction status after issuer:", approvedTrn.status);
-
-                if( approvedTrn.status === TRANSACTION_STATUS.APPROVED){
+            } else if( approvedTrn.status === TRANSACTION_STATUS.APPROVED){
         
                 
                     const notificationService = await firstValueFrom(
@@ -342,7 +343,6 @@ export class TransactionService{
                         )
                     )
         
-                }
             }
 
         } catch (error) {

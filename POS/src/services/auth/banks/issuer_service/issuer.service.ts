@@ -3,7 +3,7 @@ import { Conversion } from '../iso_val_conversions/conversions';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, set } from 'mongoose';
 import { Transaction } from 'src/services/orchestrator/entity/transaction.entity';
 import { AccountDocument } from 'src/services/account_service/document/account.doc';
 import { TRANSACTION_STATUS } from 'src/services/orchestrator/entity/transaction.entity';
@@ -299,18 +299,30 @@ export class IssuerService implements OnModuleInit {
                     let contractTransaction;
                     const setAgreements = conditions[0];  // for now only one contract at time.
 
-            
+                    
                         for( const contractAccountId of setAgreements.accounts ){
                             
                             const prevTransaction = await this.findTransaction(stan);
                             const targetAccount = await this.findTargetAccount(contractAccountId);
 
+                         
                             if( setAgreements.percentages.length > 1 ){
                            
                                 if (new Date(Date.now()) > new Date(conditions[0].expiryTime) ){
+                                    prevTransaction.status = TRANSACTION_STATUS.DECLINED;
+                                    await this.transactionRepository.save(prevTransaction);
                                     conditions.pop()
                                     throw new Error ('contract percentage expired ');
                                 };
+
+                            const totPercentage = setAgreements.percentages.reduce((firstElem,otherElem) => firstElem + otherElem,0);
+                            console.log('TOT PERCENT',totPercentage)
+                            
+                            if(totPercentage !== 100){
+                                prevTransaction.status = TRANSACTION_STATUS.DECLINED;
+                                await this.transactionRepository.save(prevTransaction);
+                                throw new Error('percentages not covering the whole amount')
+                            } 
 
                                 const splitAmount = (( setAgreements.percentages[count] / 100) * wholeAmount );
                                 prevTransaction.amount = splitAmount;
@@ -321,16 +333,15 @@ export class IssuerService implements OnModuleInit {
                                     splitAmount,
                                     terminalId,
                                     targetAccount.pan,
-                                    expiryDate
+                                    targetAccount.expiry,
                                 );
 
                                 // console.log('contract transaction', contractTransaction );
-
                         
                                 const approved = await this.callAccountService(
                                     splitAmount,
                                     contractTransaction,
-                                    expiryDate,
+                                    targetAccount.expiry,
                                     targetAccount.pan,
                                     issuerToken,
                                     contractAccountId
@@ -357,6 +368,8 @@ export class IssuerService implements OnModuleInit {
                             }else if( setAgreements.amounts.length > 1 ){
                                 
                                 if (new Date(Date.now()) > new Date(conditions[0].expiryTime) ){ 
+                                    prevTransaction.status = TRANSACTION_STATUS.DECLINED;
+                                    await this.transactionRepository.save(prevTransaction);
                                     conditions.pop()
                                     throw new Error ('contract amount expired');
                                 };
@@ -373,7 +386,7 @@ export class IssuerService implements OnModuleInit {
                                     splitAmount,
                                     terminalId,
                                     targetAccount.pan,
-                                    expiryDate
+                                    targetAccount.expiry,
                                 )
 
                                 if(! contractTransaction ) throw new Error ("contract transaction failed at creation")
@@ -382,7 +395,7 @@ export class IssuerService implements OnModuleInit {
                                const approved = await this.callAccountService(
                                     splitAmount,
                                     contractTransaction,
-                                    expiryDate,
+                                    targetAccount.expiry,
                                     targetAccount.pan,
                                     issuerToken,
                                     contractAccountId
