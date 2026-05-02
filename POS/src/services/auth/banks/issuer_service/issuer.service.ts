@@ -376,7 +376,11 @@ export class IssuerService implements OnModuleInit {
                                 const sumAmounts = setAgreements.amounts.reduce( ( acc, curr ) => acc + curr, 0 );
                             
                                 
-                                if( sumAmounts !==  wholeAmount ) throw new Error( 'Invalid amount split [issuer service] ');
+                                if( sumAmounts !==  wholeAmount ) {
+                                    prevTransaction.status = TRANSACTION_STATUS.DECLINED;
+                                    await this.transactionRepository.save(prevTransaction);
+                                    throw new Error( 'Invalid amount split [issuer service] ')
+                                };
                                 splitAmount = setAgreements.amounts[count];
 
 
