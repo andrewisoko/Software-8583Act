@@ -361,7 +361,7 @@ export class IssuerService implements OnModuleInit {
                                     this.settlementSupport(contractTransaction.id) //releasing receiver account hold and updating ledger balance. 
                                 };
                                 
-                                count =+ 1;
+                                count += 1;
 
 
                             }else if( setAgreements.amounts.length > 1 ){
@@ -421,10 +421,12 @@ export class IssuerService implements OnModuleInit {
                                     this.settlementSupport(contractTransaction.id);
                                 }
 
-                                count =+ 1
+                                count += 1
         
                             }
                         }
+
+                    conditions.shift(); // contract fulfilled — remove so next ISO message is not re-processed against the same contract
 
                     }else{
                     

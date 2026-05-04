@@ -33,9 +33,7 @@ export class SettlementService {
       const transactionStatus = await this.findTransactStatus(id);
       if (transactionStatus !== TRANSACTION_STATUS.APPROVED) throw new Error("Transaction at settlement level not approved.");
 
-      const account = await this.accountModel.findOne({
-        transactions: transaction.id
-      });
+      const account = await this.accountModel.findOne({ _id: transaction.account });
       if (!account) throw new Error ("Account at settlement level not found");
 
 
