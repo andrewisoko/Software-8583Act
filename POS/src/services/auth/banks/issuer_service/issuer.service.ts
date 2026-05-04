@@ -115,7 +115,6 @@ export class IssuerService implements OnModuleInit {
             currency:"GBP",
             amount:amount,
             merchant:"TEST MERCHANT LONDON GB",
-            customer: { id: accountData.customer },
             account:accountId,
             terminal: { id: terminalId },
             panEncrypt: JSON.stringify(this.encrypt.encrypt(rawPan.toString())),
@@ -379,7 +378,7 @@ export class IssuerService implements OnModuleInit {
                                 if( sumAmounts !==  wholeAmount ) {
                                     prevTransaction.status = TRANSACTION_STATUS.DECLINED;
                                     await this.transactionRepository.save(prevTransaction);
-                                    throw new Error( 'Invalid amount split [issuer service] ')
+                                    throw new Error( 'Invalid split amount [issuer service] ')
                                 };
                                 splitAmount = setAgreements.amounts[count];
 
