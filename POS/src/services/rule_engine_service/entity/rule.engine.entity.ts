@@ -24,7 +24,7 @@ export class RuleEngine{
     @CreateDateColumn({name:'timestamp'})
         timestamp:Date
 
-    @OneToOne(() => Transaction, transaction => transaction.ruleEngine)
+    @OneToOne(() => Transaction, transaction => transaction.rule_engine)
     @JoinColumn()
         transaction: Transaction;
 

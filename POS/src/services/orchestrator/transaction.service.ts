@@ -108,7 +108,7 @@ export class TransactionService{
                 customer:customerData,
                 account:accountData._id.toString(),
                 terminal:terminalData,
-                panEncrypt:encryptedPan,
+                pan_encrypt:encryptedPan,
                 expiryEncrypt:encryptExpiryDate,
 
                 })
@@ -174,7 +174,7 @@ export class TransactionService{
 
             if (! transaction) throw new Error ("failed transaction")
 
-            const panEncryptParse = JSON.parse(transaction.panEncrypt);
+            const panEncryptParse = JSON.parse(transaction.pan_encrypt);
             const terminalToken = transaction.terminal.acc_token
          
             let panToken;
@@ -243,7 +243,7 @@ export class TransactionService{
 
             const decision = ruleEngine.data["action"]
             const ruleEngineTable = await this.createRuleEngineTable(decision,transaction);
-            transaction.ruleEngine = ruleEngineTable;
+            transaction.rule_engine = ruleEngineTable;
 
 
             /*banks talking to each other */
@@ -258,7 +258,7 @@ export class TransactionService{
                         merchant: transaction.merchant,
                         currency: transaction.currency,
                         exiprationDate: transaction.expiryEncrypt,
-                        fullName: transaction.customer.fullName,
+                        fullName: transaction.customer.full_name,
                         stan:transaction.stan
         
                     },                    {

@@ -59,7 +59,7 @@ export class Ledger {
   @Column('varchar',{length:50, default:"550e8400-e29b-31d4-a715-446655440000"})
     account:string;
 
-  @ManyToOne(() => Transaction, transaction => transaction.ledgerEntries, { nullable: false })
+  @ManyToOne(() => Transaction, transaction => transaction.ledger_entries, { nullable: false })
   @JoinColumn({ name: 'transaction_id' })
     transaction: Transaction;
 

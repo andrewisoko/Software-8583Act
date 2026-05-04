@@ -26,13 +26,13 @@ export class Party {
     id:string;
 
     @Column('varchar', { length: 20, default: 'Name Surname' })
-    fullName:string;
+    full_name:string;
 
     @Column('varchar', { length: 90, default: '10 London Street CH15 8XF UNITED KINGDOM' })
     address:string /* not best approach to store addresss but efficient enough for the tutorial */
 
     @Column({ type: 'numeric', precision: 10, scale: 0, default:"0123456789"})
-    contactDetails: number;
+    contact_details: number;
 
     @Column({
         type:"enum",

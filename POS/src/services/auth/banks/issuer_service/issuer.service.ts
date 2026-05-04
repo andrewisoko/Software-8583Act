@@ -117,7 +117,7 @@ export class IssuerService implements OnModuleInit {
             merchant:"TEST MERCHANT LONDON GB",
             account:accountId,
             terminal: { id: terminalId },
-            panEncrypt: JSON.stringify(this.encrypt.encrypt(rawPan.toString())),
+            pan_encrypt: JSON.stringify(this.encrypt.encrypt(rawPan.toString())),
             expiryEncrypt: JSON.stringify(this.encrypt.encrypt(expiryDate.toString())),
         })
 

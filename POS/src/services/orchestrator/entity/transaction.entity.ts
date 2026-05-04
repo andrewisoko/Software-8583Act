@@ -48,16 +48,16 @@ export class Transaction {
         expiryEncrypt:string;
     
     @Column( 'text' )
-        panEncrypt:string;
+        pan_encrypt:string;
  
     @Column('varchar', {length: 50 ,default:"TEST MERCHANT LONDON GB"})
         merchant:string;
 
     @OneToMany(() => Ledger, ledger => ledger.transaction)
-        ledgerEntries: Ledger[];
+        ledger_entries: Ledger[];
 
     @OneToOne(()=>RuleEngine,ruleEngine =>ruleEngine.transaction)
-        ruleEngine:RuleEngine
+        rule_engine:RuleEngine
 
     @Column('varchar',{length:50, default:"550e8400-e29b-31d4-a715-446655440000"})
         account:string; 

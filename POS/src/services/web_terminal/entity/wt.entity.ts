@@ -23,16 +23,16 @@ export class Terminal{
         acc_token:string;
 
     @Column({ type:'integer',  default: 87671023 })
-        serialNumber:number;
+        serial_number:number;
 
     @Column( 'varchar', { length:21, default:"1.2.840.113549.1.1.11"} )
         signature:string;
 
     @Column( 'varchar', { length:50, default:"ISSUER BANK"} )
-    issuer:string;
+        issuer:string;
 
     @Column('varchar', { length: 50, default:"TEST MERCHANT LONDON GB"} )
-    subject:string;
+        subject:string;
 
     @Column({
         type:"enum",
