@@ -4,9 +4,12 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { UnauthorizedException } from '@nestjs/common';
 
+
 @Injectable()
 export class cardJwtStrategy extends PassportStrategy(Strategy, 'card-jwt') {
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -16,6 +19,7 @@ export class cardJwtStrategy extends PassportStrategy(Strategy, 'card-jwt') {
 
 
     async validate(cardPayload: any) {
+
 
  
         return {

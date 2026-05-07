@@ -4,6 +4,10 @@ import { Terminal } from "./entity/wt.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Role } from "./entity/wt.entity";
+import { HttpService } from "@nestjs/axios";
+import { FullRequestDto } from "src/api_gateway/config/dto/request.data.dto";
+import { firstValueFrom } from "rxjs";
+
 
 
 
@@ -11,6 +15,7 @@ import { Role } from "./entity/wt.entity";
 export class WebTerminal{
     constructor(
         @InjectRepository(Terminal) private readonly TerminalRepository: Repository<Terminal>,
+        private readonly httpService:HttpService,
         private readonly jwtService:JwtService,
     ){}
 
@@ -36,7 +41,9 @@ export class WebTerminal{
     }
 
    
-    async CreateWT(){
+    async CreateWT(
+        cardDetails:Partial<FullRequestDto>
+    ){
 
         const serialNumber = this.generateSerialNum();
         // console.log(serialNumber)
@@ -51,10 +58,33 @@ export class WebTerminal{
         };
         const terminal_token = this.jwtService.sign(certTerminal);
 
-        const terminalEntity = await this.TerminalRepository.create(certTerminal);
-        terminalEntity.acc_token = terminal_token
+        const terminal = await this.TerminalRepository.create(certTerminal);
+        terminal.acc_token = terminal_token
         
-        await this.TerminalRepository.save(terminalEntity);
+        await this.TerminalRepository.save(terminal);
+
+        // if camera scans payload
+
+        const userMainEndpoint = await firstValueFrom( this.httpService.post(
+            'http://localhost:3002/api.gateway/',
+            {
+                pan: cardDetails.pan,
+                amount: cardDetails.amount,
+                currency: cardDetails.currency,
+                expiry: cardDetails.currency,
+                merchant: cardDetails.merchant,
+                timestamp: cardDetails.timestamp,
+                customer: cardDetails.customer,
+                account: cardDetails.account,
+                terminal:terminal.id
+            },
+            {
+                headers:{
+                    Authorization:`Bearer ${terminal.acc_token}`
+                },
+            },
+        ))
+
 
         return {terminal_token:terminal_token}
 
