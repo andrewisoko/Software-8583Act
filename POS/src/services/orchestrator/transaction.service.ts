@@ -172,6 +172,7 @@ export class TransactionService{
                 terminal:fullRequestData.terminal,
             })
 
+            console.log('data', fullRequestData)
             if (! transaction) throw new Error ("failed transaction")
 
             const panEncryptParse = JSON.parse(transaction.pan_encrypt);

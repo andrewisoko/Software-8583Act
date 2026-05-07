@@ -65,13 +65,13 @@ export class WebTerminal{
 
         // if camera scans payload
 
-        const userMainEndpoint = await firstValueFrom( this.httpService.post(
+        const response = await firstValueFrom( this.httpService.post(
             'http://localhost:3002/api.gateway/',
             {
                 pan: cardDetails.pan,
                 amount: cardDetails.amount,
                 currency: cardDetails.currency,
-                expiry: cardDetails.currency,
+                expiry: cardDetails.expiry,
                 merchant: cardDetails.merchant,
                 timestamp: cardDetails.timestamp,
                 customer: cardDetails.customer,
@@ -86,7 +86,7 @@ export class WebTerminal{
         ))
 
 
-        return {terminal_token:terminal_token}
+        return response.data
 
     }
 
