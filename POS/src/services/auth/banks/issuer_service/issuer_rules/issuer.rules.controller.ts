@@ -25,14 +25,6 @@ interface IssuerRulesInput {
     location_agreement?:string,
 }
 
-interface GraphQLRequest {
-  query: string;
-  variables: {
-    input: IssuerRulesInput;
-  };
-}
-
-
 @Controller('issuer-rules')
 export class IssuerRulesController {
 
@@ -41,19 +33,17 @@ export class IssuerRulesController {
     private readonly issuerRulesService: IssuerRuleService){}
 
   @UseGuards(AuthGuard('contract-jwt'))
-  @Post('graphql')
-   async handleGraphQL( @Body() body: GraphQLRequest ) {
+  @Post('contract')
+  async createContract( @Body() body: IssuerRulesInput ) {
 
-    const input = body.variables.input;
-    const expiryTime = input.time_agreement[input.time_agreement.length -1];
-    console.log(input)
+    const expiryTime = body.time_agreement[body.time_agreement.length -1];
+    console.log(body)
 
     if ( new Date(Date.now()) > new Date(expiryTime) ){
       throw new Error ('contract expired.');
     } 
-      
 
-    this.issuerRulesService.contractData( input as ContractProps );
+    this.issuerRulesService.contractData( body as ContractProps );
     return 'contract received';
   }
 
